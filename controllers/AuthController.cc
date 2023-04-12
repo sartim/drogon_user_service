@@ -144,7 +144,7 @@ void AuthController::asyncHandleHttpRequest(const HttpRequestPtr& req,
 
         // Generate token for user found here and return as json
         std::string secretKey = "mysecretkey";
-        std::string payload = "{\"sub\":\"1234567890\",\"name\":\"John Doe\",\"iat\":1516239022}";
+        std::string payload = "{\"sub\":\"1234567890\",\"name\":\"" + email +"\",\"iat\":1516239022}";
         std::string jwt = generateJWT(secretKey, payload);
 
         Json::Value response;
