@@ -566,3 +566,6 @@ config.json
 
 # IDE
 .vscode
+
+# Dependencies
+/dependencies
