@@ -1,2 +1,10 @@
-# drogon_user_service
-User service implemented using Drogon Framework 1.8.4
+# Drogon User Service
+
+User service using Drogon Framework. Make sure to add models.json and config.json.
+
+## running server
+
+    $ cd build
+    $ cmake ..
+    $ make
+    $ ./drogoncore_user_service
