@@ -30,16 +30,16 @@ class UserController : public drogon::HttpController<UserController, false>
     void getUsers(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback);
 
     // Get a user by their ID
-    void getUserById(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback, int id);
+    void getUserById(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback, std::string id);
 
     // Create a new user
     void createUser(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback);
 
     // Update a user by their ID
-    void updateUserById(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback, int id);
+    void updateUserById(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback, std::string id);
 
     // Delete a user by their ID
-    void deleteUserById(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback, int id);
+    void deleteUserById(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback, std::string id);
 
   private:
     std::shared_ptr<DbClient> client_;
