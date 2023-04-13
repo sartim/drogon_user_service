@@ -48,8 +48,8 @@ std::string generateJWT(const std::string& secretKey, const std::string& payload
     std::stringstream ss;
     ss << encodedHeader << "." << encodedPayloadStr;
     std::string message = ss.str();
-    unsigned char* hmacResult = nullptr;
-    unsigned int hmacResultLen = 0;
+    unsigned int hmacResultLen = EVP_MAX_MD_SIZE;
+    unsigned char* hmacResult = (unsigned char*)malloc(hmacResultLen);
     HMAC(EVP_sha256(), secretKey.c_str(), secretKey.length(),
         (unsigned char*)message.c_str(), message.length(),
         hmacResult, &hmacResultLen);
@@ -60,11 +60,15 @@ std::string generateJWT(const std::string& secretKey, const std::string& payload
         signature += ss.str();
     }
 
+    // Free memory allocated for hmacResult
+    free(hmacResult);
+
     // Concatenate the encoded header, payload and signature to form the JWT
     std::stringstream jwtSS;
     jwtSS << encodedHeader << "." << encodedPayloadStr << "." << signature;
     return jwtSS.str();
 }
+
 
 bool verifyJWT(const std::string& secretKey, const std::string& jwt)
 {
