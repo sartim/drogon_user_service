@@ -1,4 +1,5 @@
 #include <drogon/drogon.h>
+#include <drogon/HttpAppFramework.h>
 #include <controllers/UserController.h>
 
 
@@ -27,15 +28,27 @@ int main() {
         callback(resp);
     });
 
-    // Register user route
+    // Register user routes
     auto userController = std::make_shared<UserController>();
     drogon::app().registerHandler(
-        "/api/v1/user", [userController](
-            const HttpRequestPtr& req, std::function<void(
-                const HttpResponsePtr&
-                )>&& callback) {
-        userController->getUsers(req, std::move(callback));
-    }, {Get});
+        "/api/v1/user", 
+        [userController](
+            const HttpRequestPtr& req, 
+            std::function<void(const HttpResponsePtr&)>&& callback) {
+                userController->getUsers(req, std::move(callback));
+        }, 
+        {Get, Post}
+    );
+    drogon::app().registerHandler(
+    "/api/v1/user/{id}", 
+    [userController](
+        const HttpRequestPtr& req, 
+        std::function<void(const HttpResponsePtr&)>&& callback, std::string id) {
+            userController->getUserById(req, std::move(callback), id);
+    }, 
+    {Get}
+    );
+
 
     // Run server
     drogon::app().run();
