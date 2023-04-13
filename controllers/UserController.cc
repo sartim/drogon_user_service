@@ -57,34 +57,39 @@ void UserController::getUsers(const HttpRequestPtr& req, std::function<void(cons
     }
 }
 
+void UserController::getUserById(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback, std::string id)
+{
+    auto client = app().getDbClient();
+    if (client) {
+        auto sql = "SELECT * FROM public.user WHERE id = $1";
+        auto f = client->execSqlAsyncFuture(sql, id);
+        auto result = f.get();
 
+        Json::Value usersJson(Json::arrayValue);
+        for (const auto& row : result)
+        {
+            Json::Value userJson;
+            userJson["id"] = row["id"].as<std::string>();
+            userJson["first_name"] = row["first_name"].as<std::string>();
+            userJson["last_name"] = row["last_name"].as<std::string>();
+            userJson["email"] = row["email"].as<std::string>();
+            usersJson.append(userJson);
+        }
 
+       
+        Json::Value response;
+        response["user"] = usersJson;
+        auto resp=HttpResponse::newHttpJsonResponse(response);
+        callback(resp);
 
-
-
-
-
-
-
-// void UserController::getUserById(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback, int id)
-// {
-//     auto dbClientPtr = app().getDbClient("postgresql");
-//     Mapper<User> mp(dbClientPtr);
-//     auto user = mp.findByPrimaryKey(id);
-//     if (user)
-//     {
-//         HttpViewData data;
-//         data.insert("user", *user);
-//         auto res = HttpResponse::newHttpViewResponse("user.csp", data);
-//         callback(res);
-//     }
-//     else
-//     {
-//         auto res = HttpResponse::newHttpResponse();
-//         res->setStatusCode(HttpStatusCode::k404NotFound);
-//         callback(res);
-//     }
-// }
+    } else {
+        Json::Value error;
+        error["error"] = "Unable to connect to database";
+        auto resp=HttpResponse::newHttpJsonResponse(error);
+        resp->setStatusCode(k500InternalServerError);
+        callback(resp);
+    }
+}
 
 // void UserController::createUser(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback)
 // {
