@@ -3,7 +3,6 @@
 #include <drogon/HttpController.h>
 #include <drogon/HttpResponse.h>
 #include <drogon/orm/DbClient.h>
-#include <models/User.h>
 
 using namespace drogon;
 using namespace drogon::orm;
