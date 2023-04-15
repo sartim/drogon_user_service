@@ -37,7 +37,7 @@ int main() {
             std::function<void(const HttpResponsePtr&)>&& callback) {
                 userController->getUsers(req, std::move(callback));
         }, 
-        {Get, Post}
+        {Get, Post, "AuthFilter"}
     );
     drogon::app().registerHandler(
     "/api/v1/user/{id}", 
@@ -46,11 +46,12 @@ int main() {
         std::function<void(const HttpResponsePtr&)>&& callback, std::string id) {
             userController->getUserById(req, std::move(callback), id);
     }, 
-    {Get}
+    {Get, "AuthFilter"}
     );
 
 
     // Run server
+    LOG_INFO << "Server running on 127.0.0.1:8000";
     drogon::app().run();
 
     return 0;
