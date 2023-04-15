@@ -1,18 +1,10 @@
 #include <drogon/drogon.h>
 #include <drogon/HttpAppFramework.h>
-#include <controllers/UserController.h>
+#include "controllers/UserController.h"
+#include "tables/UserTable.h"
 
-
-int main() {
-    // Set log level
-    drogon::app().setLogLevel(trantor::Logger::kTrace);
-
-    //Set HTTP listener address and port
-    drogon::app().addListener("0.0.0.0",8000);
-
-    //Load config file
-    drogon::app().loadConfigFile("../config.json");
-
+void registerRoutes()
+{
     // Register root route
     drogon::app().registerHandler(
         "/", 
@@ -49,9 +41,36 @@ int main() {
     {Get, "AuthFilter"}
     );
 
+}
+
+// void createTables() {
+//     // User table
+//     auto userTable = std::make_shared<UserTable>();
+//     userTable->create();
+// }
+
+
+int main() {
+    //CreateTables
+    // createTables();
+
+    auto userTable = std::make_shared<UserTable>();
+    userTable->create();
+
+    // Set log level
+    drogon::app().setLogLevel(trantor::Logger::kTrace);
+    std::int32_t port = 8000;
+    //Set HTTP listener address and port
+    drogon::app().addListener("0.0.0.0", port);
+
+    //Load config file
+    drogon::app().loadConfigFile("../config.json");
+
+    // Register routes
+    registerRoutes();
 
     // Run server
-    LOG_INFO << "Server running on 127.0.0.1:8000";
+    LOG_INFO << "Server running on 127.0.0.1:" << port;
     drogon::app().run();
 
     return 0;
