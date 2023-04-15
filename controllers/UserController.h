@@ -11,12 +11,11 @@ class UserController : public drogon::HttpController<UserController, false>
 {
   public:
     METHOD_LIST_BEGIN
-        // CRUD Operations
-        METHOD_ADD(UserController::getUsers, "/user", Get);
-        METHOD_ADD(UserController::getUserById, "/user/{id}", Get);
-        METHOD_ADD(UserController::createUser, "/user", Post);
-        METHOD_ADD(UserController::updateUserById, "/user/{id}", Put);
-        METHOD_ADD(UserController::deleteUserById, "/user/{id}", Delete);
+    METHOD_ADD(UserController::getUsers, "/api/v1/user", Get, "AuthFilter");
+    METHOD_ADD(UserController::getUserById, "/api/v1/user/{id}", Get, "AuthFilter");
+    METHOD_ADD(UserController::createUser, "/api/v1/user", Post, "AuthFilter");
+    METHOD_ADD(UserController::updateUserById, "/api/v1/user/{id}", Put, "AuthFilter");
+    METHOD_ADD(UserController::deleteUserById, "/api/v1/user/{id}", Delete, "AuthFilter");
     METHOD_LIST_END
   
   public:
