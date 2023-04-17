@@ -8,6 +8,13 @@
 using namespace drogon;
 using namespace drogon::orm;
 
+void UserController::connect()
+{
+    if (client == nullptr) {
+        client = drogon::app().getDbClient();
+    }
+}
+
 void UserController::getUsers(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback)
 {
     LOG_DEBUG << "Received request: " << req->methodString() << " " << req->path();
@@ -16,7 +23,7 @@ void UserController::getUsers(const HttpRequestPtr& req, std::function<void(cons
 
     if (client) {
         try {
-            Mapper<drogon_model::go_cms_db::User> mp(client);
+            Mapper<drogon_model::drogon_user_service::User> mp(client);
         
             auto f = client->execSqlAsyncFuture("SELECT * FROM public.user");
             auto result = f.get();
