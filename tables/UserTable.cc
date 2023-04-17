@@ -19,11 +19,11 @@ void UserTable::create() {
 
     try {
         auto sql = "CREATE TABLE IF NOT EXISTS public."+ USER_TABLE_NAME +" ("
-            "id UUID PRIMARY KEY NOT NULL,"
-            "first_name VARCHAR(50) NOT NULL,"
-            "last_name VARCHAR(50) NOT NULL,"
-            "email VARCHAR(50) UNIQUE NOT NULL,"
-            "password VARCHAR(50) UNIQUE NOT NULL,"
+            "id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,"
+            "first_name VARCHAR(255) NOT NULL,"
+            "last_name VARCHAR(255) NOT NULL,"
+            "email VARCHAR(255) UNIQUE NOT NULL,"
+            "password VARCHAR(255) UNIQUE NOT NULL,"
             "is_deleted BOOL,"
             "created_at timestamp with time zone NOT NULL,"
             "updated_at timestamp with time zone,"
