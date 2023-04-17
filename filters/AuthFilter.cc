@@ -11,6 +11,7 @@
 #include <sstream>
 #include <iomanip>
 #include <ctime>
+#include <drogon/drogon.h>
 #include "AuthFilter.h"
 
 using namespace drogon;
@@ -76,13 +77,15 @@ void AuthFilter::doFilter(const HttpRequestPtr &req,
                          FilterChainCallback &&fccb)
 {  
     const std::string token = req->getHeader("Authorization");
-    std::string secretKey = "mysecretkey";
+    const std::string secretKey = drogon::app().getCustomConfig()["secret_key"].asString();
     if (verifyJWT(secretKey, token)) {
-        auto response = drogon::HttpResponse::newHttpResponse();
+        Json::Value error;
+        error["error"] = "Unauthorized";
+        auto response = drogon::HttpResponse::newHttpJsonResponse(error);
         response->setStatusCode(k401Unauthorized);
-        response->setBody("Unauthorized");
         fcb(response);
     } else {
         fccb();
     }
 }
+
