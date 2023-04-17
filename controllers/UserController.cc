@@ -8,16 +8,11 @@
 using namespace drogon;
 using namespace drogon::orm;
 
-void UserController::connect()
-{
-    if (client == nullptr) {
-        client = drogon::app().getDbClient();
-    }
-}
-
 void UserController::getUsers(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback)
 {
     LOG_DEBUG << "Received request: " << req->methodString() << " " << req->path();
+    
+    connect();
 
     if (client) {
         try {
