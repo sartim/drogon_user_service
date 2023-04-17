@@ -235,7 +235,7 @@ class User
     }
     std::string sqlForInserting(bool &needSelection) const
     {
-        std::string sql="insert into " + tableName + " (";
+        std::string sql="insert into public." + tableName + " (";
         size_t parametersCount = 0;
         needSelection = false;
         if(dirtyFlag_[0])
@@ -352,6 +352,7 @@ class User
             sql.append(1, ')');
         }
         LOG_TRACE << sql;
+        std::cout << sql << std::endl;
         return sql;
     }
 };
