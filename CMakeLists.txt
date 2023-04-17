@@ -80,5 +80,11 @@ target_sources(${PROJECT_NAME}
 add_subdirectory(test)
 
 find_package(OpenSSL REQUIRED)
+find_package(jwt-cpp REQUIRED)
+find_library(BCRYPT_LIBRARY bcrypt)
+
 target_include_directories(${PROJECT_NAME} PRIVATE ${OPENSSL_INCLUDE_DIR})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${OPENSSL_LIBRARIES})
+target_include_directories(${PROJECT_NAME} PRIVATE jwt-cpp)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${BCRYPT_LIBRARY})
+
