@@ -43,19 +43,17 @@ void registerRoutes()
 
 }
 
-// void createTables() {
-//     // User table
-//     auto userTable = std::make_shared<UserTable>();
-//     userTable->create();
-// }
+void createTables() {
+    // User table
+    auto userTable = std::make_shared<UserTable>();
+    auto client = drogon::app().getDbClient();
+    userTable->create(client);
+}
 
 
 int main() {
     //CreateTables
-    // createTables();
-
-    auto userTable = std::make_shared<UserTable>();
-    userTable->create();
+    createTables();
 
     // Set log level
     drogon::app().setLogLevel(trantor::Logger::kTrace);
