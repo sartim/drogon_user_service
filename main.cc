@@ -13,10 +13,9 @@ void registerRoutes()
                 const drogon::HttpResponsePtr&
                 )>&& callback
           ) {
-        drogon::HttpResponsePtr resp = drogon::HttpResponse::newHttpResponse();
         Json::Value response;
-            response["status"] = "up";
-        resp->setBody("Welcome to drogon user service");
+        response["status"] = "up";
+        drogon::HttpResponsePtr resp = drogon::HttpResponse::newHttpJsonResponse(response);
         callback(resp);
     });
 
