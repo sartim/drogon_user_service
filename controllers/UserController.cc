@@ -2,19 +2,22 @@
 #include <drogon/HttpViewData.h>
 #include <drogon/HttpResponse.h>
 #include <drogon/HttpSimpleController.h>
-#include <drogon/orm/DbClient.h>
 #include "../models/User.h"
 #include "UserController.h"
 
 using namespace drogon;
 using namespace drogon::orm;
 
+void UserController::connect()
+{
+    if (client == nullptr) {
+        client = drogon::app().getDbClient();
+    }
+}
+
 void UserController::getUsers(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback)
 {
     LOG_DEBUG << "Received request: " << req->methodString() << " " << req->path();
-
-    auto client = drogon::app().getDbClient();
-
 
     if (client) {
         try {
@@ -59,7 +62,6 @@ void UserController::getUsers(const HttpRequestPtr& req, std::function<void(cons
 
 void UserController::getUserById(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback, std::string id)
 {
-    auto client = app().getDbClient();
     if (client) {
         auto sql = "SELECT * FROM public.user WHERE id = $1";
         auto f = client->execSqlAsyncFuture(sql, id);
@@ -93,8 +95,8 @@ void UserController::getUserById(const HttpRequestPtr& req, std::function<void(c
 
 // void UserController::createUser(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback)
 // {
-//     auto dbClientPtr = app().getDbClient("postgresql");
-//     Mapper<User> mp(dbClientPtr);
+//     auto dbclientPtr = app().getDbClient("postgresql");
+//     Mapper<User> mp(dbclientPtr);
 
 //     // Get the user data from the request body
 //     auto jsonBody = req->getJsonObject();
@@ -121,8 +123,8 @@ void UserController::getUserById(const HttpRequestPtr& req, std::function<void(c
 
 // void UserController::updateUser(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback, int id)
 // {
-//     auto dbClientPtr = app().getDbClient("postgresql");
-//     Mapper<User> mp(dbClientPtr);
+//     auto dbclientPtr = app().getDbClient("postgresql");
+//     Mapper<User> mp(dbclientPtr);
 
 //     // Get the user data from the request body
 //     auto jsonBody = req->getJsonObject();
