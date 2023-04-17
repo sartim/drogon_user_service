@@ -4,11 +4,27 @@ User service using Drogon Framework. Make sure to add models.json and config.jso
 
 ## Requirements
 
-    * Drogon 1.8.4
+    * [Drogon](https://github.com/drogonframework/drogon)
+    * [PostgreSQL](https://www.postgresql.org)
+    * [JWT-CPP](https://github.com/Thalhammer/jwt-cpp)
+    * [Bcrypt](https://github.com/rg3/bcrypt.git)
+    * [OpenSSL](https://github.com/openssl/openssl.git)
 
-# Install OpenSSL
+## Setup bcrypt
 
-    $ git clone https://github.com/openssl/openssl.git
+    $ sudo cp bcrypt.a /usr/local/lib/
+    $ sudo cp bcrypt.h /usr/local/include/
+
+## Install jwt-cpp
+
+    $ cd build
+    $ cmake ..
+    $ make
+    $ sudo make installl
+    
+
+## Install OpenSSL
+
     $ cd openssl
     $ ./config shared no-ssl2
     $ make
