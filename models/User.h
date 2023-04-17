@@ -34,7 +34,7 @@ using DbClientPtr = std::shared_ptr<DbClient>;
 }
 namespace drogon_model
 {
-namespace go_cms_db
+namespace drogon_user_service
 {
 
 class User
@@ -42,16 +42,15 @@ class User
   public:
     struct Cols
     {
-        static const std::string _created_at;
-        static const std::string _updated_at;
-        static const std::string _deleted_at;
         static const std::string _id;
         static const std::string _first_name;
         static const std::string _last_name;
         static const std::string _email;
         static const std::string _password;
-        static const std::string _is_active;
-        static const std::string _deleted;
+        static const std::string _is_deleted;
+        static const std::string _created_at;
+        static const std::string _updated_at;
+        static const std::string _deleted_at;
     };
 
     const static int primaryKeyNumber;
@@ -103,6 +102,60 @@ class User
                           std::string &err,
                           bool isForCreation);
 
+    /**  For column id  */
+    ///Get the value of the column id, returns the default value if the column is null
+    const std::string &getValueOfId() const noexcept;
+    ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
+    const std::shared_ptr<std::string> &getId() const noexcept;
+    ///Set the value of the column id
+    void setId(const std::string &pId) noexcept;
+    void setId(std::string &&pId) noexcept;
+
+    /**  For column first_name  */
+    ///Get the value of the column first_name, returns the default value if the column is null
+    const std::string &getValueOfFirstName() const noexcept;
+    ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
+    const std::shared_ptr<std::string> &getFirstName() const noexcept;
+    ///Set the value of the column first_name
+    void setFirstName(const std::string &pFirstName) noexcept;
+    void setFirstName(std::string &&pFirstName) noexcept;
+
+    /**  For column last_name  */
+    ///Get the value of the column last_name, returns the default value if the column is null
+    const std::string &getValueOfLastName() const noexcept;
+    ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
+    const std::shared_ptr<std::string> &getLastName() const noexcept;
+    ///Set the value of the column last_name
+    void setLastName(const std::string &pLastName) noexcept;
+    void setLastName(std::string &&pLastName) noexcept;
+
+    /**  For column email  */
+    ///Get the value of the column email, returns the default value if the column is null
+    const std::string &getValueOfEmail() const noexcept;
+    ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
+    const std::shared_ptr<std::string> &getEmail() const noexcept;
+    ///Set the value of the column email
+    void setEmail(const std::string &pEmail) noexcept;
+    void setEmail(std::string &&pEmail) noexcept;
+
+    /**  For column password  */
+    ///Get the value of the column password, returns the default value if the column is null
+    const std::string &getValueOfPassword() const noexcept;
+    ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
+    const std::shared_ptr<std::string> &getPassword() const noexcept;
+    ///Set the value of the column password
+    void setPassword(const std::string &pPassword) noexcept;
+    void setPassword(std::string &&pPassword) noexcept;
+
+    /**  For column is_deleted  */
+    ///Get the value of the column is_deleted, returns the default value if the column is null
+    const bool &getValueOfIsDeleted() const noexcept;
+    ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
+    const std::shared_ptr<bool> &getIsDeleted() const noexcept;
+    ///Set the value of the column is_deleted
+    void setIsDeleted(const bool &pIsDeleted) noexcept;
+    void setIsDeletedToNull() noexcept;
+
     /**  For column created_at  */
     ///Get the value of the column created_at, returns the default value if the column is null
     const ::trantor::Date &getValueOfCreatedAt() const noexcept;
@@ -110,7 +163,6 @@ class User
     const std::shared_ptr<::trantor::Date> &getCreatedAt() const noexcept;
     ///Set the value of the column created_at
     void setCreatedAt(const ::trantor::Date &pCreatedAt) noexcept;
-    void setCreatedAtToNull() noexcept;
 
     /**  For column updated_at  */
     ///Get the value of the column updated_at, returns the default value if the column is null
@@ -130,75 +182,8 @@ class User
     void setDeletedAt(const ::trantor::Date &pDeletedAt) noexcept;
     void setDeletedAtToNull() noexcept;
 
-    /**  For column id  */
-    ///Get the value of the column id, returns the default value if the column is null
-    const std::string &getValueOfId() const noexcept;
-    ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
-    const std::shared_ptr<std::string> &getId() const noexcept;
-    ///Set the value of the column id
-    void setId(const std::string &pId) noexcept;
-    void setId(std::string &&pId) noexcept;
 
-    /**  For column first_name  */
-    ///Get the value of the column first_name, returns the default value if the column is null
-    const std::string &getValueOfFirstName() const noexcept;
-    ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
-    const std::shared_ptr<std::string> &getFirstName() const noexcept;
-    ///Set the value of the column first_name
-    void setFirstName(const std::string &pFirstName) noexcept;
-    void setFirstName(std::string &&pFirstName) noexcept;
-    void setFirstNameToNull() noexcept;
-
-    /**  For column last_name  */
-    ///Get the value of the column last_name, returns the default value if the column is null
-    const std::string &getValueOfLastName() const noexcept;
-    ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
-    const std::shared_ptr<std::string> &getLastName() const noexcept;
-    ///Set the value of the column last_name
-    void setLastName(const std::string &pLastName) noexcept;
-    void setLastName(std::string &&pLastName) noexcept;
-    void setLastNameToNull() noexcept;
-
-    /**  For column email  */
-    ///Get the value of the column email, returns the default value if the column is null
-    const std::string &getValueOfEmail() const noexcept;
-    ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
-    const std::shared_ptr<std::string> &getEmail() const noexcept;
-    ///Set the value of the column email
-    void setEmail(const std::string &pEmail) noexcept;
-    void setEmail(std::string &&pEmail) noexcept;
-    void setEmailToNull() noexcept;
-
-    /**  For column password  */
-    ///Get the value of the column password, returns the default value if the column is null
-    const std::string &getValueOfPassword() const noexcept;
-    ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
-    const std::shared_ptr<std::string> &getPassword() const noexcept;
-    ///Set the value of the column password
-    void setPassword(const std::string &pPassword) noexcept;
-    void setPassword(std::string &&pPassword) noexcept;
-    void setPasswordToNull() noexcept;
-
-    /**  For column is_active  */
-    ///Get the value of the column is_active, returns the default value if the column is null
-    const bool &getValueOfIsActive() const noexcept;
-    ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
-    const std::shared_ptr<bool> &getIsActive() const noexcept;
-    ///Set the value of the column is_active
-    void setIsActive(const bool &pIsActive) noexcept;
-    void setIsActiveToNull() noexcept;
-
-    /**  For column deleted  */
-    ///Get the value of the column deleted, returns the default value if the column is null
-    const bool &getValueOfDeleted() const noexcept;
-    ///Return a shared_ptr object pointing to the column const value, or an empty shared_ptr object if the column is null
-    const std::shared_ptr<bool> &getDeleted() const noexcept;
-    ///Set the value of the column deleted
-    void setDeleted(const bool &pDeleted) noexcept;
-    void setDeletedToNull() noexcept;
-
-
-    static size_t getColumnNumber() noexcept {  return 10;  }
+    static size_t getColumnNumber() noexcept {  return 9;  }
     static const std::string &getColumnName(size_t index) noexcept(false);
 
     Json::Value toJson() const;
@@ -215,16 +200,15 @@ class User
     void updateArgs(drogon::orm::internal::SqlBinder &binder) const;
     ///For mysql or sqlite3
     void updateId(const uint64_t id);
-    std::shared_ptr<::trantor::Date> createdAt_;
-    std::shared_ptr<::trantor::Date> updatedAt_;
-    std::shared_ptr<::trantor::Date> deletedAt_;
     std::shared_ptr<std::string> id_;
     std::shared_ptr<std::string> firstName_;
     std::shared_ptr<std::string> lastName_;
     std::shared_ptr<std::string> email_;
     std::shared_ptr<std::string> password_;
-    std::shared_ptr<bool> isActive_;
-    std::shared_ptr<bool> deleted_;
+    std::shared_ptr<bool> isDeleted_;
+    std::shared_ptr<::trantor::Date> createdAt_;
+    std::shared_ptr<::trantor::Date> updatedAt_;
+    std::shared_ptr<::trantor::Date> deletedAt_;
     struct MetaData
     {
         const std::string colName_;
@@ -236,7 +220,7 @@ class User
         const bool notNull_;
     };
     static const std::vector<MetaData> metaData_;
-    bool dirtyFlag_[10]={ false };
+    bool dirtyFlag_[9]={ false };
   public:
     static const std::string &sqlForFindingByPrimaryKey()
     {
@@ -256,53 +240,47 @@ class User
         needSelection = false;
         if(dirtyFlag_[0])
         {
-            sql += "created_at,";
+            sql += "id,";
             ++parametersCount;
         }
         if(dirtyFlag_[1])
         {
-            sql += "updated_at,";
+            sql += "first_name,";
             ++parametersCount;
         }
         if(dirtyFlag_[2])
         {
-            sql += "deleted_at,";
-            ++parametersCount;
-        }
-        sql += "id,";
-        ++parametersCount;
-        if(!dirtyFlag_[3])
-        {
-            needSelection=true;
-        }
-        if(dirtyFlag_[4])
-        {
-            sql += "first_name,";
-            ++parametersCount;
-        }
-        if(dirtyFlag_[5])
-        {
             sql += "last_name,";
             ++parametersCount;
         }
-        if(dirtyFlag_[6])
+        if(dirtyFlag_[3])
         {
             sql += "email,";
             ++parametersCount;
         }
-        if(dirtyFlag_[7])
+        if(dirtyFlag_[4])
         {
             sql += "password,";
             ++parametersCount;
         }
-        if(dirtyFlag_[8])
+        if(dirtyFlag_[5])
         {
-            sql += "is_active,";
+            sql += "is_deleted,";
             ++parametersCount;
         }
-        if(dirtyFlag_[9])
+        if(dirtyFlag_[6])
         {
-            sql += "deleted,";
+            sql += "created_at,";
+            ++parametersCount;
+        }
+        if(dirtyFlag_[7])
+        {
+            sql += "updated_at,";
+            ++parametersCount;
+        }
+        if(dirtyFlag_[8])
+        {
+            sql += "deleted_at,";
             ++parametersCount;
         }
         if(parametersCount > 0)
@@ -336,10 +314,6 @@ class User
             n = snprintf(placeholderStr, sizeof(placeholderStr),"$%d,",placeholder++);
             sql.append(placeholderStr, n);
         }
-        else
-        {
-            sql +="default,";
-        }
         if(dirtyFlag_[4])
         {
             n = snprintf(placeholderStr, sizeof(placeholderStr),"$%d,",placeholder++);
@@ -365,11 +339,6 @@ class User
             n = snprintf(placeholderStr, sizeof(placeholderStr),"$%d,",placeholder++);
             sql.append(placeholderStr, n);
         }
-        if(dirtyFlag_[9])
-        {
-            n = snprintf(placeholderStr, sizeof(placeholderStr),"$%d,",placeholder++);
-            sql.append(placeholderStr, n);
-        }
         if(parametersCount > 0)
         {
             sql.resize(sql.length() - 1);
@@ -386,5 +355,5 @@ class User
         return sql;
     }
 };
-} // namespace go_cms_db
+} // namespace drogon_user_service
 } // namespace drogon_model
