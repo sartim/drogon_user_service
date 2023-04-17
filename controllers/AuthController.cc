@@ -1,3 +1,4 @@
+#include <jwt-cpp/jwt.h>
 #include <openssl/evp.h>
 #include <openssl/bio.h>
 #include <openssl/buffer.h>
@@ -19,54 +20,12 @@ using namespace drogon::orm;
 
 std::string generateJWT(const std::string& secretKey, const std::string& payload)
 {
-    // Get current time
-    std::time_t currentTime = std::time(nullptr);
-
-    // Encode the payload as base64
-    BIO* b64 = BIO_new(BIO_f_base64());
-    BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
-    BIO* bmem = BIO_new(BIO_s_mem());
-    b64 = BIO_push(b64, bmem);
-    BIO_write(b64, payload.c_str(), payload.length());
-    BIO_flush(b64);
-    char* encodedPayload;
-    long encodedPayloadSize = BIO_get_mem_data(bmem, &encodedPayload);
-    std::string encodedPayloadStr(encodedPayload, encodedPayloadSize - 1);
-
-    // Generate the header
-    std::string header = "{\"alg\":\"HS256\",\"typ\":\"JWT\"}";
-    std::string encodedHeader;
-    b64 = BIO_new(BIO_f_base64());
-    b64 = BIO_push(b64, bmem);
-    BIO_write(b64, header.c_str(), header.length());
-    BIO_flush(b64);
-    char* encodedHeaderCharPtr;
-    long encodedHeaderSize = BIO_get_mem_data(bmem, &encodedHeaderCharPtr);
-    encodedHeader = std::string(encodedHeaderCharPtr, encodedHeaderSize - 1);
-
-    // Generate the signature
-    std::stringstream ss;
-    ss << encodedHeader << "." << encodedPayloadStr;
-    std::string message = ss.str();
-    unsigned int hmacResultLen = EVP_MAX_MD_SIZE;
-    unsigned char* hmacResult = (unsigned char*)malloc(hmacResultLen);
-    HMAC(EVP_sha256(), secretKey.c_str(), secretKey.length(),
-        (unsigned char*)message.c_str(), message.length(),
-        hmacResult, &hmacResultLen);
-    std::string signature;
-    for (unsigned int i = 0; i < hmacResultLen; i++) {
-        std::stringstream ss;
-        ss << std::hex << std::setfill('0') << std::setw(2) << (int)hmacResult[i];
-        signature += ss.str();
-    }
-
-    // Free memory allocated for hmacResult
-    free(hmacResult);
-
-    // Concatenate the encoded header, payload and signature to form the JWT
-    std::stringstream jwtSS;
-    jwtSS << encodedHeader << "." << encodedPayloadStr << "." << signature;
-    return jwtSS.str();
+    auto token = jwt::create()
+    .set_issuer("auth0")
+    .set_type("JWS")
+    .set_payload_claim("sample", jwt::claim(std::string("test")))
+    .sign(jwt::algorithm::hs256{"secret"});
+    return token;
 }
 
 void AuthController::asyncHandleHttpRequest(const HttpRequestPtr& req,
