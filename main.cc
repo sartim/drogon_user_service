@@ -45,8 +45,7 @@ void registerRoutes()
 void createTables() {
     // User table
     auto userTable = std::make_shared<UserTable>();
-    auto client = drogon::app().getDbClient();
-    userTable->create(client);
+    userTable->create();
 }
 
 
