@@ -9,8 +9,7 @@ const std::string USER_TABLE_NAME = "user";
 
 void UserTable::create(drogon::orm::DbClientPtr client) {
     try {
-        client->execSqlSync(
-            "CREATE TABLE IF NOT EXISTS " + USER_TABLE_NAME + " ("
+        auto sql = "CREATE TABLE IF NOT EXISTS $1 ("
             "id UUID PRIMARY KEY NOT NULL,"
             "first_name VARCHAR(50) NOT NULL,"
             "last_name VARCHAR(50) NOT NULL,"
@@ -20,8 +19,8 @@ void UserTable::create(drogon::orm::DbClientPtr client) {
             "created_at timestamp with time zone NOT NULL,"
             "updated_at timestamp with time zone,"
             "deleted_at timestamp with time zone"
-            ")"
-        );
+            ")";
+        client->execSqlSync(sql, USER_TABLE_NAME);
         LOG_DEBUG << "Created table " << USER_TABLE_NAME;
     } catch (const std::exception& e) {
         LOG_ERROR << "Failed to create table " << USER_TABLE_NAME << ": " << e.what();
@@ -34,7 +33,8 @@ void UserTable::alter(drogon::orm::DbClientPtr client) {
 
 void UserTable::_delete(drogon::orm::DbClientPtr client) {
     try {
-        client->execSqlSync("DROP TABLE IF EXISTS " + USER_TABLE_NAME);
+        auto sql = "DROP TABLE IF EXISTS $1";
+        client->execSqlSync(sql, USER_TABLE_NAME);
         LOG_DEBUG << "Dropped table " << USER_TABLE_NAME;
     } catch (const std::exception& e) {
         LOG_ERROR << "Failed to drop table " << USER_TABLE_NAME << ": " << e.what();
