@@ -8,11 +8,17 @@ using namespace drogon::orm;
 class UserTable
 {
   public:
-    UserTable() {};
+    UserTable() {
+      connect();
+    };
 
   public:
-    void create(drogon::orm::DbClientPtr client);
-    void alter(drogon::orm::DbClientPtr client);
-    void _delete(drogon::orm::DbClientPtr client);
+    void create();
+    void alter();
+    void _delete();
+  
+  private:
+    drogon::orm::DbClientPtr client;
+    void connect();
 };
 
