@@ -15,8 +15,10 @@ void UserTable::connect()
 }
 
 void UserTable::create() {
+    connect();
+
     try {
-        auto sql = "CREATE TABLE IF NOT EXISTS $1 ("
+        auto sql = "CREATE TABLE IF NOT EXISTS public."+ USER_TABLE_NAME +" ("
             "id UUID PRIMARY KEY NOT NULL,"
             "first_name VARCHAR(50) NOT NULL,"
             "last_name VARCHAR(50) NOT NULL,"
@@ -27,12 +29,17 @@ void UserTable::create() {
             "updated_at timestamp with time zone,"
             "deleted_at timestamp with time zone"
             ")";
-        client->execSqlSync(sql, USER_TABLE_NAME);
-        LOG_DEBUG << "Created table " << USER_TABLE_NAME;
+        if (client) {
+            client->execSqlSync(sql);
+            LOG_DEBUG << "Created table " << USER_TABLE_NAME;
+        } else {
+            LOG_WARN << "Connection failed";
+        }
     } catch (const std::exception& e) {
         LOG_ERROR << "Failed to create table " << USER_TABLE_NAME << ": " << e.what();
     }
 }
+
 
 void UserTable::alter() {
     // TODO: Add ALTER TABLE query to modify table structure
