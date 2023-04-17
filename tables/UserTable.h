@@ -19,6 +19,8 @@ class UserTable
   
   private:
     drogon::orm::DbClientPtr client;
+
+    // connect to database
     void connect();
 };
 
