@@ -1,3 +1,4 @@
+#include "bcrypt.h"
 #include <drogon/orm/Mapper.h>
 #include <drogon/HttpViewData.h>
 #include <drogon/HttpResponse.h>
@@ -95,33 +96,60 @@ void UserController::getUserById(const HttpRequestPtr& req, std::function<void(c
     }
 }
 
-// void UserController::createUser(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback)
-// {
-//     auto dbclientPtr = app().getDbClient("postgresql");
-//     Mapper<User> mp(dbclientPtr);
+void UserController::createUser(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback)
+{   
+    auto _client = drogon::app().getDbClient();
+    Mapper<drogon_model::drogon_user_service::User> mp(_client);
 
-//     // Get the user data from the request body
-//     auto jsonBody = req->getJsonObject();
-//     User user;
-//     user.setName(jsonBody["name"].asString());
-//     user.setEmail(jsonBody["email"].asString());
+    auto jsonBody = req->getJsonObject();
+    drogon_model::drogon_user_service::User user;
+    user.setFirstName((*jsonBody)["first_name"].asString());
+    user.setLastName((*jsonBody)["last_name"].asString());
+    user.setEmail((*jsonBody)["email"].asString());
+    user.setIsDeleted(true);
+    std::string password = (*jsonBody)["password"].asString();
+    char salt[BCRYPT_HASHSIZE];
+    char hash[BCRYPT_HASHSIZE];
+    // Generate a salt with a work factor of 12
+    bcrypt_gensalt(12, salt);
+    // Hash the password using the generated salt
+    if (bcrypt_hashpw(password.c_str(), salt, hash) == 0) {
+        std::cout << "Password hashed successfully: " << hash << std::endl;
+        user.setPassword(hash);
+    } else {
+        std::cerr << "Failed to hash password" << std::endl;
+    }
+    auto currDate = trantor::Date::now();
+    std::cout << currDate.toDbString() << std::endl;
+    user.setCreatedAt(currDate);
 
-//     // Save the new user to the database
-//     auto result = mp.insert(user);
-//     if (result.affectedRows() == 1)
-//     {
-//         auto res = HttpResponse::newHttpResponse();
-//         res->setStatusCode(HttpStatusCode::k201Created);
-//         res->addHeader("Location", "/users/" + std::to_string(result.insertId()));
-//         callback(res);
-//     }
-//     else
-//     {
-//         auto res = HttpResponse::newHttpResponse();
-//         res->setStatusCode(HttpStatusCode::k500InternalServerError);
-//         callback(res);
-//     }
-// }
+    try {
+        // Save the new user to the database
+        auto result = mp.insertFuture(user);
+        if (result.wait_for(std::chrono::seconds(1)) == std::future_status::ready) {
+            auto r = result.get();
+            Json::Value response;
+            response["user"] = r.toJson();
+            auto resp = HttpResponse::newHttpJsonResponse(response);
+            resp->setStatusCode(k200OK);
+            resp->setContentTypeCode(CT_APPLICATION_JSON);
+            callback(resp);
+        } else {
+            std::cerr << "Error: future not ready" << std::endl;
+        }
+    }
+    catch (const std::exception& e) {
+        // Code to handle the exception
+        std::cerr << "Exception caught: " << typeid(e).name() << " - " << e.what() << std::endl;
+    }
+
+    Json::Value response;
+    response["user"] = "result";
+    auto resp = HttpResponse::newHttpJsonResponse(response);
+    resp->setStatusCode(k200OK);
+    resp->setContentTypeCode(CT_APPLICATION_JSON);
+    callback(resp);
+}
 
 // void UserController::updateUser(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback, int id)
 // {
