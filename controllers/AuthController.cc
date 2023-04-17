@@ -94,7 +94,7 @@ void AuthController::asyncHandleHttpRequest(const HttpRequestPtr& req,
         }
 
         // Generate token for user found here and return as json
-        std::string secretKey = "mysecretkey";
+        const std::string secretKey = drogon::app().getCustomConfig()["secret_key"].asString();
         std::string payload = "{\"sub\":\"1234567890\",\"name\":\"" + email +"\",\"iat\":1516239022}";
         std::string jwt = generateJWT(secretKey, payload);
 
