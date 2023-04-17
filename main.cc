@@ -35,9 +35,13 @@ void registerRoutes()
     drogon::app().registerHandler(
         "/api/v1/user", 
         [userController](
-            const HttpRequestPtr& req, 
-            std::function<void(const HttpResponsePtr&)>&& callback) {
+        const HttpRequestPtr& req, 
+        std::function<void(const HttpResponsePtr&)>&& callback) {
+            if (req->method() == Get) {
                 userController->getUsers(req, std::move(callback));
+            } else if (req->method() == Post) {
+                userController->createUser(req, std::move(callback));
+            }
         }, 
         {Get, Post, "AuthFilter"}
     );
