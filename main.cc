@@ -3,6 +3,13 @@
 #include "controllers/UserController.h"
 #include "tables/UserTable.h"
 
+
+void createTables() {
+    // User table
+    UserTable userTable;
+    userTable.create();
+}
+
 void registerRoutes()
 {
     // Register root route
@@ -13,6 +20,10 @@ void registerRoutes()
                 const drogon::HttpResponsePtr&
                 )>&& callback
           ) {
+        // Create tables
+        createTables();
+        
+        // Return response
         Json::Value response;
         response["status"] = "up";
         drogon::HttpResponsePtr resp = drogon::HttpResponse::newHttpJsonResponse(response);
@@ -42,16 +53,8 @@ void registerRoutes()
 
 }
 
-void createTables() {
-    // User table
-    auto userTable = std::make_shared<UserTable>();
-    userTable->create();
-}
-
 
 int main() {
-    //CreateTables
-    createTables();
 
     // Set log level
     drogon::app().setLogLevel(trantor::Logger::kTrace);
