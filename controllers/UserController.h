@@ -21,7 +21,7 @@ class UserController : public drogon::HttpController<UserController, false>
   public:
     UserController()
     {
-        LOG_DEBUG << "UserController constructor!";
+        connect();
     }
   
   public:
@@ -41,7 +41,7 @@ class UserController : public drogon::HttpController<UserController, false>
     void deleteUserById(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback, std::string id);
 
   private:
-    std::shared_ptr<DbClient> client_;
+    drogon::orm::DbClientPtr client;
 
     // Connect to the database
     void connect();
