@@ -7,7 +7,14 @@ using namespace drogon::orm;
 
 const std::string USER_TABLE_NAME = "user";
 
-void UserTable::create(drogon::orm::DbClientPtr client) {
+void UserTable::connect()
+{
+    if (client == nullptr) {
+        client = drogon::app().getDbClient();
+    }
+}
+
+void UserTable::create() {
     try {
         auto sql = "CREATE TABLE IF NOT EXISTS $1 ("
             "id UUID PRIMARY KEY NOT NULL,"
@@ -27,11 +34,11 @@ void UserTable::create(drogon::orm::DbClientPtr client) {
     }
 }
 
-void UserTable::alter(drogon::orm::DbClientPtr client) {
+void UserTable::alter() {
     // TODO: Add ALTER TABLE query to modify table structure
 }
 
-void UserTable::_delete(drogon::orm::DbClientPtr client) {
+void UserTable::_delete() {
     try {
         auto sql = "DROP TABLE IF EXISTS $1";
         client->execSqlSync(sql, USER_TABLE_NAME);
