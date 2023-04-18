@@ -37,22 +37,32 @@ void registerRoutes()
         [userController](
         const HttpRequestPtr& req, 
         std::function<void(const HttpResponsePtr&)>&& callback) {
-            if (req->method() == Get) {
+            if (req->method() == Options) {
+                userController->getHeaders(req, std::move(callback));
+            } else if (req->method() == Get) {
                 userController->getUsers(req, std::move(callback));
             } else if (req->method() == Post) {
                 userController->createUser(req, std::move(callback));
             }
         }, 
-        {Get, Post, "AuthFilter"}
+        {Options, Get, Post, "AuthFilter"}
     );
     drogon::app().registerHandler(
     "/api/v1/user/{id}", 
     [userController](
         const HttpRequestPtr& req, 
         std::function<void(const HttpResponsePtr&)>&& callback, std::string id) {
-            userController->getUserById(req, std::move(callback), id);
+            if (req->method() == Options) {
+                userController->getByIdHeaders(req, std::move(callback), id);
+            } else if (req->method() == Get) {
+                userController->getUserById(req, std::move(callback), id);
+            } else if (req->method() == Put) {
+                userController->updateUserById(req, std::move(callback), id);;
+            } else if (req->method() == Delete) {
+                userController->deleteUserById(req, std::move(callback), id);;
+            }
     }, 
-    {Get, "AuthFilter"}
+    {Options, Get, Put, Delete, "AuthFilter"}
     );
 
 }
