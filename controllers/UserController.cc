@@ -16,6 +16,28 @@ void UserController::connect()
     }
 }
 
+void UserController::getHeaders(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback) {
+    Json::Value response;
+    auto resp = HttpResponse::newHttpJsonResponse(response);
+    resp->setStatusCode(k200OK);
+    resp->addHeader("Access-Control-Allow-Origin", "*");
+    resp->addHeader("Access-Control-Allow-Headers", "Content-Type");
+    resp->addHeader("Access-Control-Allow-Methods", "OPTIONS,POST,GET");
+    resp->setContentTypeCode(CT_APPLICATION_JSON);
+    callback(resp);
+}
+
+void UserController::getByIdHeaders(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback, std::string id) {
+    Json::Value response;
+    auto resp = HttpResponse::newHttpJsonResponse(response);
+    resp->setStatusCode(k200OK);
+    resp->addHeader("Access-Control-Allow-Origin", "*");
+    resp->addHeader("Access-Control-Allow-Headers", "Content-Type");
+    resp->addHeader("Access-Control-Allow-Methods", "OPTIONS,DELETE,PUT,GET");
+    resp->setContentTypeCode(CT_APPLICATION_JSON);
+    callback(resp);
+}
+
 void UserController::getUsers(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback)
 {
     LOG_DEBUG << "Received request: " << req->methodString() << " " << req->path();
@@ -45,6 +67,7 @@ void UserController::getUsers(const HttpRequestPtr& req, std::function<void(cons
             auto resp = HttpResponse::newHttpJsonResponse(response);
             resp->setStatusCode(k200OK);
             resp->setContentTypeCode(CT_APPLICATION_JSON);
+            resp->addHeader("Access-Control-Allow-Origin", "*");
             callback(resp);
 
         } catch (const std::exception &e) {
@@ -52,6 +75,7 @@ void UserController::getUsers(const HttpRequestPtr& req, std::function<void(cons
             error["error"] = e.what();
             auto resp=HttpResponse::newHttpJsonResponse(error);
             resp->setStatusCode(k500InternalServerError);
+            resp->addHeader("Access-Control-Allow-Origin", "*");
             callback(resp);
         }
     } else {
@@ -59,6 +83,7 @@ void UserController::getUsers(const HttpRequestPtr& req, std::function<void(cons
         error["error"] = "Unable to connect to database";
         auto resp=HttpResponse::newHttpJsonResponse(error);
         resp->setStatusCode(k500InternalServerError);
+        resp->addHeader("Access-Control-Allow-Origin", "*");
         callback(resp);
     }
 }
@@ -85,6 +110,9 @@ void UserController::getUserById(const HttpRequestPtr& req, std::function<void(c
         Json::Value response;
         response["user"] = usersJson;
         auto resp=HttpResponse::newHttpJsonResponse(response);
+        resp->setStatusCode(k200OK);
+        resp->setContentTypeCode(CT_APPLICATION_JSON);
+        resp->addHeader("Access-Control-Allow-Origin", "*");
         callback(resp);
 
     } else {
@@ -92,6 +120,8 @@ void UserController::getUserById(const HttpRequestPtr& req, std::function<void(c
         error["error"] = "Unable to connect to database";
         auto resp=HttpResponse::newHttpJsonResponse(error);
         resp->setStatusCode(k500InternalServerError);
+        resp->setContentTypeCode(CT_APPLICATION_JSON);
+        resp->addHeader("Access-Control-Allow-Origin", "*");
         callback(resp);
     }
 }
@@ -131,7 +161,7 @@ void UserController::createUser(const HttpRequestPtr& req, std::function<void(co
             Json::Value response;
             response["user"] = r.toJson();
             auto resp = HttpResponse::newHttpJsonResponse(response);
-            resp->setStatusCode(k200OK);
+            resp->setStatusCode(k201Created);
             resp->setContentTypeCode(CT_APPLICATION_JSON);
             callback(resp);
         } else {
@@ -148,6 +178,7 @@ void UserController::createUser(const HttpRequestPtr& req, std::function<void(co
     auto resp = HttpResponse::newHttpJsonResponse(response);
     resp->setStatusCode(k200OK);
     resp->setContentTypeCode(CT_APPLICATION_JSON);
+    resp->addHeader("Access-Control-Allow-Origin", "*");
     callback(resp);
 }
 

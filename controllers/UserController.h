@@ -25,6 +25,12 @@ class UserController : public drogon::HttpController<UserController, false>
     }
   
   public:
+    // Get a headers for OPTIONS method
+    void getHeaders(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback);
+
+    // Get a headers for OPTIONS method
+    void getByIdHeaders(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback, std::string id);
+
     // Get a list of all users
     void getUsers(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback);
 
