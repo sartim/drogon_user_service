@@ -24,6 +24,8 @@ std::string generateJWT(const std::string& secretKey, const std::string& payload
     .set_issuer("auth0")
     .set_type("JWS")
     .set_payload_claim("sample", jwt::claim(std::string("test")))
+    .set_issued_at(std::chrono::system_clock::now())
+    .set_expires_at(std::chrono::system_clock::now() + std::chrono::seconds{3600})
     .sign(jwt::algorithm::hs256{"secret"});
     return token;
 }
