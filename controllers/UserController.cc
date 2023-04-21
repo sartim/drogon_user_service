@@ -46,8 +46,6 @@ void UserController::getUsers(const HttpRequestPtr& req, std::function<void(cons
 
     if (client) {
         try {
-            Mapper<drogon_model::drogon_user_service::User> mp(client);
-        
             auto f = client->execSqlAsyncFuture("SELECT * FROM public.user");
             auto result = f.get();
 
@@ -182,45 +180,45 @@ void UserController::createUser(const HttpRequestPtr& req, std::function<void(co
     callback(resp);
 }
 
-// void UserController::updateUser(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback, int id)
-// {
-//     auto dbclientPtr = app().getDbClient("postgresql");
-//     Mapper<User> mp(dbclientPtr);
+void UserController::updateUserById(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback, std::string id)
+{
+    // auto dbclientPtr = app().getDbClient("postgresql");
+    // Mapper<User> mp(dbclientPtr);
 
-//     // Get the user data from the request body
-//     auto jsonBody = req->getJsonObject();
-//     User user;
-//     user.setId(id);
-//     user.setName(jsonBody["name"].asString());
-//     user.setEmail(jsonBody["email"].asString());
+    // // Get the user data from the request body
+    // auto jsonBody = req->getJsonObject();
+    // User user;
+    // user.setId(id);
+    // user.setName(jsonBody["name"].asString());
+    // user.setEmail(jsonBody["email"].asString());
 
-//     // Update the user in the database
-//     auto result = mp.update(user);
-//     if (result.affectedRows() == 1)
-//     {
-//         auto res = HttpResponse::newHttpResponse();
-//         res->setStatusCode(HttpStatusCode::k204NoContent);
-//         callback(res);
-//     }
-//     else
-//     {
-//         auto res = HttpResponse::newHttpResponse();
-//         res->setStatusCode(HttpStatusCode::k500InternalServerError);
-//         callback(res);
-//     }
-// }
+    // // Update the user in the database
+    // auto result = mp.update(user);
+    // if (result.affectedRows() == 1)
+    // {
+    //     auto res = HttpResponse::newHttpResponse();
+    //     res->setStatusCode(HttpStatusCode::k204NoContent);
+    //     callback(res);
+    // }
+    // else
+    // {
+    //     auto res = HttpResponse::newHttpResponse();
+    //     res->setStatusCode(HttpStatusCode::k500InternalServerError);
+    //     callback(res);
+    // }
+}
 
 
-// void UserController::deleteUserById(const HttpRequestPtr& req,
-//                                 std::function<void(const HttpResponsePtr&)>&& callback,
-//                                 int userId) {
-//     auto client = app().getDbClient("postgresql");
-//     auto result = client->execSqlSync("DELETE FROM users WHEREid = $1", userId);
-//     if (result.first && result.second.affectedRows() > 0) {
-//         auto res = HttpResponse::newRedirectionResponse("/users");
-//         callback(res);
-//     } else {
-//         auto res = HttpResponse::newNotFoundResponse();
-//         callback(res);
-//     }
-// }
+void UserController::deleteUserById(const HttpRequestPtr& req,
+                                std::function<void(const HttpResponsePtr&)>&& callback,
+                                std::string userId) {
+    // auto client = app().getDbClient("postgresql");
+    // auto result = client->execSqlSync("DELETE FROM users WHEREid = $1", userId);
+    // if (result.first && result.second.affectedRows() > 0) {
+    //     auto res = HttpResponse::newRedirectionResponse("/users");
+    //     callback(res);
+    // } else {
+    //     auto res = HttpResponse::newNotFoundResponse();
+    //     callback(res);
+    // }
+}
