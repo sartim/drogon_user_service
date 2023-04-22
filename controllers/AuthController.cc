@@ -12,7 +12,7 @@
 #include <drogon/HttpResponse.h>
 #include <drogon/orm/DbClient.h>
 #include "AuthController.h"
-#include "../models/User.h"
+#include "../models/Users.h"
 
 using namespace drogon;
 using namespace drogon::orm;
