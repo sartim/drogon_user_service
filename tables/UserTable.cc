@@ -5,7 +5,7 @@
 using namespace drogon;
 using namespace drogon::orm;
 
-const std::string USER_TABLE_NAME = "user";
+const std::string USER_TABLE_NAME = "users";
 
 void UserTable::connect()
 {
