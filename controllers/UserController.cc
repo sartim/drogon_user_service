@@ -41,15 +41,35 @@ void UserController::getByIdHeaders(const HttpRequestPtr& req, std::function<voi
 void UserController::getUsers(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback)
 {
     LOG_DEBUG << "Received request: " << req->methodString() << " " << req->path();
-    
+
     connect();
 
     if (client) {
         try {
+            // Get query parameters
+            auto query = req->getParameters();
+            int page = 1;
+            auto page_it = query.find("page");
+            if (page_it != query.end()) {
+                page = std::stoi(page_it->second);
+            }
+            int page_size = 25;
+            auto page_size_it = query.find("page_size");
+            if (page_size_it != query.end()) {
+                page_size = std::stoi(page_size_it->second);
+            }
+
+            // Calculate offset and limit
+            int offset = (page - 1) * page_size;
+            int limit = page_size;
+
             Mapper<drogon_model::drogon_user_service::Users> mp(client);
 
-            auto users = mp.orderBy(drogon_model::drogon_user_service::Users::Cols::_created_at).limit(25).offset(0).findAll();
-            Json::Value response; 
+            auto users = mp.orderBy(drogon_model::drogon_user_service::Users::Cols::_created_at)
+                           .limit(limit)
+                           .offset(offset)
+                           .findAll();
+            Json::Value response;
             Json::Value usersJson(Json::arrayValue);
             for (const auto& user : users) {
                 Json::Value userJson;
@@ -61,7 +81,7 @@ void UserController::getUsers(const HttpRequestPtr& req, std::function<void(cons
                 userJson["updated_at"] = user.getValueOfUpdatedAt().toDbString();
                 usersJson.append(userJson);
             }
-            response["users"] = usersJson;
+            response["results"] = usersJson;
             auto resp = HttpResponse::newHttpJsonResponse(response);
             resp->setStatusCode(k200OK);
             resp->addHeader("Access-Control-Allow-Origin", "*");
@@ -85,6 +105,8 @@ void UserController::getUsers(const HttpRequestPtr& req, std::function<void(cons
         callback(resp);
     }
 }
+
+
 
 void UserController::getUserById(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback, std::string id)
 {
