@@ -6,6 +6,7 @@
 #include "../models/Users.h"
 #include "UserController.h"
 
+using namespace std;
 using namespace drogon;
 using namespace drogon::orm;
 
@@ -16,7 +17,7 @@ void UserController::connect()
     }
 }
 
-void UserController::getHeaders(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback) {
+void UserController::getHeaders(const HttpRequestPtr& req, function<void(const HttpResponsePtr&)>&& callback) {
     Json::Value response;
     auto resp = HttpResponse::newHttpJsonResponse(response);
     resp->setStatusCode(k200OK);
@@ -27,7 +28,7 @@ void UserController::getHeaders(const HttpRequestPtr& req, std::function<void(co
     callback(resp);
 }
 
-void UserController::getByIdHeaders(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback, std::string id) {
+void UserController::getByIdHeaders(const HttpRequestPtr& req, function<void(const HttpResponsePtr&)>&& callback, string id) {
     Json::Value response;
     auto resp = HttpResponse::newHttpJsonResponse(response);
     resp->setStatusCode(k200OK);
@@ -38,7 +39,7 @@ void UserController::getByIdHeaders(const HttpRequestPtr& req, std::function<voi
     callback(resp);
 }
 
-void UserController::getUsers(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback)
+void UserController::getUsers(const HttpRequestPtr& req, function<void(const HttpResponsePtr&)>&& callback)
 {
     LOG_DEBUG << "Received request: " << req->methodString() << " " << req->path();
 
@@ -51,12 +52,12 @@ void UserController::getUsers(const HttpRequestPtr& req, std::function<void(cons
             int page = 1;
             auto page_it = query.find("page");
             if (page_it != query.end()) {
-                page = std::stoi(page_it->second);
+                page =stoi(page_it->second);
             }
             int page_size = 25;
             auto page_size_it = query.find("page_size");
             if (page_size_it != query.end()) {
-                page_size = std::stoi(page_size_it->second);
+                page_size =stoi(page_size_it->second);
             }
 
             // Calculate offset and limit
@@ -88,7 +89,7 @@ void UserController::getUsers(const HttpRequestPtr& req, std::function<void(cons
             callback(resp);
 
 
-        } catch (const std::exception &e) {
+        } catch (const exception &e) {
             Json::Value error;
             error["error"] = e.what();
             auto resp=HttpResponse::newHttpJsonResponse(error);
@@ -108,7 +109,7 @@ void UserController::getUsers(const HttpRequestPtr& req, std::function<void(cons
 
 
 
-void UserController::getUserById(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback, std::string id)
+void UserController::getUserById(const HttpRequestPtr& req,function<void(const HttpResponsePtr&)>&& callback, string id)
 {
     if (client) {
         Mapper<drogon_model::drogon_user_service::Users> mp(client);
@@ -138,7 +139,7 @@ void UserController::getUserById(const HttpRequestPtr& req, std::function<void(c
     }
 }
 
-void UserController::createUser(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback)
+void UserController::createUser(const HttpRequestPtr& req,function<void(const HttpResponsePtr&)>&& callback)
 {   
     auto _client = drogon::app().getDbClient();
     Mapper<drogon_model::drogon_user_service::Users> mp(_client);
@@ -149,26 +150,26 @@ void UserController::createUser(const HttpRequestPtr& req, std::function<void(co
     user.setLastName((*jsonBody)["last_name"].asString());
     user.setEmail((*jsonBody)["email"].asString());
     user.setIsDeleted(true);
-    std::string password = (*jsonBody)["password"].asString();
+    string password = (*jsonBody)["password"].asString();
     char salt[BCRYPT_HASHSIZE];
     char hash[BCRYPT_HASHSIZE];
     // Generate a salt with a work factor of 12
     bcrypt_gensalt(12, salt);
     // Hash the password using the generated salt
     if (bcrypt_hashpw(password.c_str(), salt, hash) == 0) {
-        std::cout << "Password hashed successfully: " << hash << std::endl;
+       cout << "Password hashed successfully: " << hash <<endl;
         user.setPassword(hash);
     } else {
-        std::cerr << "Failed to hash password" << std::endl;
+       cerr << "Failed to hash password" <<endl;
     }
     auto currDate = trantor::Date::now();
-    std::cout << currDate.toDbString() << std::endl;
+    cout << currDate.toDbString() <<endl;
     user.setCreatedAt(currDate);
 
     try {
         // Save the new user to the database
         auto result = mp.insertFuture(user);
-        if (result.wait_for(std::chrono::seconds(1)) == std::future_status::ready) {
+        if (result.wait_for(std::chrono::seconds(1)) ==future_status::ready) {
             auto r = result.get();
             Json::Value response;
             response["user"] = r.toJson();
@@ -177,12 +178,12 @@ void UserController::createUser(const HttpRequestPtr& req, std::function<void(co
             resp->setContentTypeCode(CT_APPLICATION_JSON);
             callback(resp);
         } else {
-            std::cerr << "Error: future not ready" << std::endl;
+           cerr << "Error: future not ready" <<endl;
         }
     }
-    catch (const std::exception& e) {
+    catch (const exception& e) {
         // Code to handle the exception
-        std::cerr << "Exception caught: " << typeid(e).name() << " - " << e.what() << std::endl;
+       cerr << "Exception caught: " << typeid(e).name() << " - " << e.what() <<endl;
     }
 
     Json::Value response;
@@ -194,38 +195,54 @@ void UserController::createUser(const HttpRequestPtr& req, std::function<void(co
     callback(resp);
 }
 
-void UserController::updateUserById(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback, std::string id)
+void UserController::updateUserById(const HttpRequestPtr& req,function<void(const HttpResponsePtr&)>&& callback, string id)
 {
-    // auto dbclientPtr = app().getDbClient("postgresql");
-    // Mapper<User> mp(dbclientPtr);
+    char salt[BCRYPT_HASHSIZE];
+    char hash[BCRYPT_HASHSIZE];
 
-    // // Get the user data from the request body
-    // auto jsonBody = req->getJsonObject();
-    // User user;
-    // user.setId(id);
-    // user.setName(jsonBody["name"].asString());
-    // user.setEmail(jsonBody["email"].asString());
+    // Generate a salt with a work factor of 12
+    bcrypt_gensalt(12, salt);
 
-    // // Update the user in the database
-    // auto result = mp.update(user);
-    // if (result.affectedRows() == 1)
-    // {
-    //     auto res = HttpResponse::newHttpResponse();
-    //     res->setStatusCode(HttpStatusCode::k204NoContent);
-    //     callback(res);
-    // }
-    // else
-    // {
-    //     auto res = HttpResponse::newHttpResponse();
-    //     res->setStatusCode(HttpStatusCode::k500InternalServerError);
-    //     callback(res);
-    // }
+    Mapper<drogon_model::drogon_user_service::Users> mp(client);
+
+    auto jsonBody = req->getJsonObject();
+    string firstName = jsonBody->get("first_name", "").asString();
+    string lastName = jsonBody->get("last_name", "").asString();
+    string email = jsonBody->get("email", "").asString();
+    string password = jsonBody->get("password", "").asString();
+
+    drogon_model::drogon_user_service::Users user;
+
+    user.setId(id);
+    user.setFirstName(firstName);
+    user.setLastName(lastName);
+    user.setEmail(email);
+    user.setEmail(email);
+
+    // Hash the password using the generated salt
+    if (bcrypt_hashpw(password.c_str(), salt, hash) == 0) {
+        cout << "Password hashed successfully: " << hash <<endl;
+        user.setPassword(hash);
+    } else {
+        cerr << "Failed to hash password" <<endl;
+    }
+
+    // Update the user in the database
+    auto result = mp.update(user);
+    
+    Json::Value response;
+    response["user"] = user.toJson();
+    auto resp = HttpResponse::newHttpJsonResponse(response);
+    resp->setStatusCode(k200OK);
+    resp->setContentTypeCode(CT_APPLICATION_JSON);
+    resp->addHeader("Access-Control-Allow-Origin", "*");
+    callback(resp);
 }
 
 
 void UserController::deleteUserById(const HttpRequestPtr& req,
-                                std::function<void(const HttpResponsePtr&)>&& callback,
-                                std::string userId) {
+                               function<void(const HttpResponsePtr&)>&& callback,
+                               string userId) {
     // auto client = app().getDbClient("postgresql");
     // auto result = client->execSqlSync("DELETE FROM users WHEREid = $1", userId);
     // if (result.first && result.second.affectedRows() > 0) {
