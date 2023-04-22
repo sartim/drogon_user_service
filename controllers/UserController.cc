@@ -243,13 +243,23 @@ void UserController::updateUserById(const HttpRequestPtr& req,function<void(cons
 void UserController::deleteUserById(const HttpRequestPtr& req,
                                function<void(const HttpResponsePtr&)>&& callback,
                                string userId) {
-    // auto client = app().getDbClient("postgresql");
-    // auto result = client->execSqlSync("DELETE FROM users WHEREid = $1", userId);
-    // if (result.first && result.second.affectedRows() > 0) {
-    //     auto res = HttpResponse::newRedirectionResponse("/users");
-    //     callback(res);
-    // } else {
-    //     auto res = HttpResponse::newNotFoundResponse();
-    //     callback(res);
-    // }
+     Mapper<drogon_model::drogon_user_service::Users> mp(client);
+
+    auto user = mp.deleteByPrimaryKey(userId);
+    
+    if (user) {
+        auto resp = HttpResponse::newHttpResponse();
+        resp->setStatusCode(k204NoContent);
+        resp->setContentTypeCode(CT_APPLICATION_JSON);
+        resp->addHeader("Access-Control-Allow-Origin", "*");
+        callback(resp);
+    } else {
+        Json::Value response;
+        response["error"] = "Record not found";
+        auto resp = HttpResponse::newHttpJsonResponse(response);
+        resp->setStatusCode(k400BadRequest);
+        resp->setContentTypeCode(CT_APPLICATION_JSON);
+        resp->addHeader("Access-Control-Allow-Origin", "*");
+        callback(resp);
+    }
 }
