@@ -111,30 +111,22 @@ void UserController::getUsers(const HttpRequestPtr& req, std::function<void(cons
 void UserController::getUserById(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback, std::string id)
 {
     if (client) {
-        auto sql = "SELECT * FROM public.user WHERE id = $1";
-        auto f = client->execSqlAsyncFuture(sql, id);
-        auto result = f.get();
+        Mapper<drogon_model::drogon_user_service::Users> mp(client);
+        auto user = mp.findByPrimaryKey(id);
 
         Json::Value usersJson(Json::arrayValue);
-        for (const auto& row : result)
-        {
-            Json::Value userJson;
-            userJson["id"] = row["id"].as<std::string>();
-            userJson["first_name"] = row["first_name"].as<std::string>();
-            userJson["last_name"] = row["last_name"].as<std::string>();
-            userJson["email"] = row["email"].as<std::string>();
-            usersJson.append(userJson);
-        }
+        Json::Value userJson;
+        userJson["id"] = user.getValueOfId();
+        userJson["first_name"] = user.getValueOfFirstName();
+        userJson["last_name"] = user.getValueOfLastName();
+        userJson["email"] = user.getValueOfEmail();
+        usersJson.append(userJson);
 
-       
-        Json::Value response;
-        response["user"] = usersJson;
-        auto resp=HttpResponse::newHttpJsonResponse(response);
+        auto resp=HttpResponse::newHttpJsonResponse(usersJson);
         resp->setStatusCode(k200OK);
         resp->setContentTypeCode(CT_APPLICATION_JSON);
         resp->addHeader("Access-Control-Allow-Origin", "*");
         callback(resp);
-
     } else {
         Json::Value error;
         error["error"] = "Unable to connect to database";
