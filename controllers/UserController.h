@@ -4,6 +4,7 @@
 #include <drogon/HttpResponse.h>
 #include <drogon/orm/DbClient.h>
 
+using namespace std;
 using namespace drogon;
 using namespace drogon::orm;
 
@@ -26,25 +27,25 @@ class UserController : public drogon::HttpController<UserController, false>
   
   public:
     // Get a headers for OPTIONS method
-    void getHeaders(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback);
+    void getHeaders(const HttpRequestPtr& req, function<void(const HttpResponsePtr&)>&& callback);
 
     // Get a headers for OPTIONS method
-    void getByIdHeaders(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback, std::string id);
+    void getByIdHeaders(const HttpRequestPtr& req, function<void(const HttpResponsePtr&)>&& callback, string id);
 
     // Get a list of all users
-    void getUsers(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback);
+    void getUsers(const HttpRequestPtr& req, function<void(const HttpResponsePtr&)>&& callback);
 
     // Get a user by their ID
-    void getUserById(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback, std::string id);
+    void getUserById(const HttpRequestPtr& req, function<void(const HttpResponsePtr&)>&& callback, string id);
 
     // Create a new user
-    void createUser(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback);
+    static void createUser(const HttpRequestPtr& req, function<void(const HttpResponsePtr&)>&& callback);
 
     // Update a user by their ID
-    void updateUserById(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback, std::string id);
+    void updateUserById(const HttpRequestPtr& req, function<void(const HttpResponsePtr&)>&& callback, string id);
 
     // Delete a user by their ID
-    void deleteUserById(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback, std::string id);
+    void deleteUserById(const HttpRequestPtr& req, function<void(const HttpResponsePtr&)>&& callback, string id);
 
   private:
     drogon::orm::DbClientPtr client;
