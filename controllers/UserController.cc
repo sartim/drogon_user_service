@@ -3,7 +3,7 @@
 #include <drogon/HttpViewData.h>
 #include <drogon/HttpResponse.h>
 #include <drogon/HttpSimpleController.h>
-#include "../models/User.h"
+#include "../models/Users.h"
 #include "UserController.h"
 
 using namespace drogon;
@@ -46,27 +46,27 @@ void UserController::getUsers(const HttpRequestPtr& req, std::function<void(cons
 
     if (client) {
         try {
-            auto f = client->execSqlAsyncFuture("SELECT * FROM public.user");
-            auto result = f.get();
+            Mapper<drogon_model::drogon_user_service::Users> mp(client);
 
+            auto users = mp.orderBy(drogon_model::drogon_user_service::Users::Cols::_created_at).limit(25).offset(0).findAll();
+            Json::Value response; 
             Json::Value usersJson(Json::arrayValue);
-            for (const auto& row : result)
-            {
+            for (const auto& user : users) {
                 Json::Value userJson;
-                userJson["id"] = row["id"].as<std::string>();
-                userJson["first_name"] = row["first_name"].as<std::string>();
-                userJson["last_name"] = row["last_name"].as<std::string>();
-                userJson["email"] = row["email"].as<std::string>();
+                userJson["id"] = user.getValueOfId();
+                userJson["first_name"] = user.getValueOfFirstName();
+                userJson["last_name"] =  user.getValueOfLastName();
+                userJson["email"] = user.getValueOfEmail();
+                userJson["created_at"] = user.getValueOfCreatedAt().toDbString();
+                userJson["updated_at"] = user.getValueOfUpdatedAt().toDbString();
                 usersJson.append(userJson);
             }
-
-            Json::Value response;
             response["users"] = usersJson;
             auto resp = HttpResponse::newHttpJsonResponse(response);
             resp->setStatusCode(k200OK);
-            resp->setContentTypeCode(CT_APPLICATION_JSON);
             resp->addHeader("Access-Control-Allow-Origin", "*");
             callback(resp);
+
 
         } catch (const std::exception &e) {
             Json::Value error;
@@ -127,10 +127,10 @@ void UserController::getUserById(const HttpRequestPtr& req, std::function<void(c
 void UserController::createUser(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback)
 {   
     auto _client = drogon::app().getDbClient();
-    Mapper<drogon_model::drogon_user_service::User> mp(_client);
+    Mapper<drogon_model::drogon_user_service::Users> mp(_client);
 
     auto jsonBody = req->getJsonObject();
-    drogon_model::drogon_user_service::User user;
+    drogon_model::drogon_user_service::Users user;
     user.setFirstName((*jsonBody)["first_name"].asString());
     user.setLastName((*jsonBody)["last_name"].asString());
     user.setEmail((*jsonBody)["email"].asString());
