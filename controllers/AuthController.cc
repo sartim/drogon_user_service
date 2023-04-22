@@ -2,7 +2,6 @@
 #include <sstream>
 #include <drogon/HttpController.h>
 #include <drogon/orm/Mapper.h>
-#include <drogon/HttpViewData.h>
 #include <drogon/HttpResponse.h>
 #include "AuthController.h"
 #include "../models/Users.h"
@@ -10,6 +9,7 @@
 using namespace std;
 using namespace drogon;
 using namespace drogon::orm;
+using namespace drogon_model::drogon_user_service;
 
 
 string generateJWT(const string& secretKey, const string& email)
@@ -33,9 +33,9 @@ void AuthController::asyncHandleHttpRequest(const HttpRequestPtr& req,
         auto email = (*jsonBody)["email"].asString();
         auto password = (*jsonBody)["password"].asString();
 
-        Mapper<drogon_model::drogon_user_service::Users> mp(client);
+        Mapper<Users> mp(client);
         auto user = mp.findFutureBy(
-                Criteria(drogon_model::drogon_user_service::Users::Cols::_email, email));
+                Criteria(Users::Cols::_email, email));
         auto result = user.get();
         Json::Value usersJson(Json::arrayValue);
         for (const auto& user : result)
@@ -55,9 +55,8 @@ void AuthController::asyncHandleHttpRequest(const HttpRequestPtr& req,
         Json::Value response;
         response["token"] = jwt;
         response["user"] = usersJson;
-        auto resp=HttpResponse::newHttpJsonResponse(response);
+        auto resp= HttpResponse::newHttpJsonResponse(response);
         callback(resp);
-
     } else {
         Json::Value error;
         error["error"] = "Unable to connect to database";
@@ -65,5 +64,4 @@ void AuthController::asyncHandleHttpRequest(const HttpRequestPtr& req,
         resp->setStatusCode(k500InternalServerError);
         callback(resp);
     }
-
 }

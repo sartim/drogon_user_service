@@ -9,6 +9,7 @@
 using namespace std;
 using namespace drogon;
 using namespace drogon::orm;
+using namespace drogon_model::drogon_user_service;
 
 void UserController::connect()
 {
@@ -64,9 +65,9 @@ void UserController::getUsers(const HttpRequestPtr& req, function<void(const Htt
             int offset = (page - 1) * page_size;
             int limit = page_size;
 
-            Mapper<drogon_model::drogon_user_service::Users> mp(client);
+            Mapper<Users> mp(client);
 
-            auto users = mp.orderBy(drogon_model::drogon_user_service::Users::Cols::_created_at)
+            auto users = mp.orderBy(Users::Cols::_created_at)
                            .limit(limit)
                            .offset(offset)
                            .findAll();
@@ -112,7 +113,7 @@ void UserController::getUsers(const HttpRequestPtr& req, function<void(const Htt
 void UserController::getUserById(const HttpRequestPtr& req,function<void(const HttpResponsePtr&)>&& callback, string id)
 {
     if (client) {
-        Mapper<drogon_model::drogon_user_service::Users> mp(client);
+        Mapper<Users> mp(client);
         auto user = mp.findByPrimaryKey(id);
 
         Json::Value usersJson(Json::arrayValue);
@@ -142,10 +143,10 @@ void UserController::getUserById(const HttpRequestPtr& req,function<void(const H
 void UserController::createUser(const HttpRequestPtr& req,function<void(const HttpResponsePtr&)>&& callback)
 {   
     auto _client = drogon::app().getDbClient();
-    Mapper<drogon_model::drogon_user_service::Users> mp(_client);
+    Mapper<Users> mp(_client);
 
     auto jsonBody = req->getJsonObject();
-    drogon_model::drogon_user_service::Users user;
+    Users user;
     user.setFirstName((*jsonBody)["first_name"].asString());
     user.setLastName((*jsonBody)["last_name"].asString());
     user.setEmail((*jsonBody)["email"].asString());
@@ -203,7 +204,7 @@ void UserController::updateUserById(const HttpRequestPtr& req,function<void(cons
     // Generate a salt with a work factor of 12
     bcrypt_gensalt(12, salt);
 
-    Mapper<drogon_model::drogon_user_service::Users> mp(client);
+    Mapper<Users> mp(client);
 
     auto jsonBody = req->getJsonObject();
     string firstName = jsonBody->get("first_name", "").asString();
@@ -211,7 +212,7 @@ void UserController::updateUserById(const HttpRequestPtr& req,function<void(cons
     string email = jsonBody->get("email", "").asString();
     string password = jsonBody->get("password", "").asString();
 
-    drogon_model::drogon_user_service::Users user;
+    Users user;
 
     user.setId(id);
     user.setFirstName(firstName);
@@ -243,7 +244,7 @@ void UserController::updateUserById(const HttpRequestPtr& req,function<void(cons
 void UserController::deleteUserById(const HttpRequestPtr& req,
                                function<void(const HttpResponsePtr&)>&& callback,
                                string userId) {
-     Mapper<drogon_model::drogon_user_service::Users> mp(client);
+     Mapper<Users> mp(client);
 
     auto user = mp.deleteByPrimaryKey(userId);
     
