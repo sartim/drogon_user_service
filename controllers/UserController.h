@@ -3,15 +3,18 @@
 #include <drogon/HttpController.h>
 #include <drogon/HttpResponse.h>
 #include <drogon/orm/DbClient.h>
+#include "BaseController.h"
 
 using namespace std;
 using namespace drogon;
 using namespace drogon::orm;
 
-class UserController : public drogon::HttpController<UserController, false>
+class UserController : public HttpController<UserController, false>, public BaseController
 {
   public:
     METHOD_LIST_BEGIN
+    METHOD_ADD(UserController::getHeaders, "/api/v1/user", Options);
+    METHOD_ADD(UserController::getByIdHeaders, "/api/v1/user/{id}", Options);
     METHOD_ADD(UserController::getUsers, "/api/v1/user", Get, "AuthFilter");
     METHOD_ADD(UserController::getUserById, "/api/v1/user/{id}", Get, "AuthFilter");
     METHOD_ADD(UserController::createUser, "/api/v1/user", Post, "AuthFilter");
@@ -26,12 +29,6 @@ class UserController : public drogon::HttpController<UserController, false>
     }
   
   public:
-    // Get a headers for OPTIONS method
-    void getHeaders(const HttpRequestPtr& req, function<void(const HttpResponsePtr&)>&& callback);
-
-    // Get a headers for OPTIONS method
-    void getByIdHeaders(const HttpRequestPtr& req, function<void(const HttpResponsePtr&)>&& callback, string id);
-
     // Get a list of all users
     void getUsers(const HttpRequestPtr& req, function<void(const HttpResponsePtr&)>&& callback);
 
@@ -39,7 +36,7 @@ class UserController : public drogon::HttpController<UserController, false>
     void getUserById(const HttpRequestPtr& req, function<void(const HttpResponsePtr&)>&& callback, string id);
 
     // Create a new user
-    static void createUser(const HttpRequestPtr& req, function<void(const HttpResponsePtr&)>&& callback);
+    void createUser(const HttpRequestPtr& req, function<void(const HttpResponsePtr&)>&& callback);
 
     // Update a user by their ID
     void updateUserById(const HttpRequestPtr& req, function<void(const HttpResponsePtr&)>&& callback, string id);
@@ -49,8 +46,6 @@ class UserController : public drogon::HttpController<UserController, false>
 
   private:
     drogon::orm::DbClientPtr client;
-
-    // Connect to the database
     void connect();
 
 };

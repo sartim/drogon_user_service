@@ -18,32 +18,9 @@ void UserController::connect()
     }
 }
 
-void UserController::getHeaders(const HttpRequestPtr& req, function<void(const HttpResponsePtr&)>&& callback) {
-    Json::Value response;
-    auto resp = HttpResponse::newHttpJsonResponse(response);
-    resp->setStatusCode(k200OK);
-    resp->addHeader("Access-Control-Allow-Origin", "*");
-    resp->addHeader("Access-Control-Allow-Headers", "Content-Type");
-    resp->addHeader("Access-Control-Allow-Methods", "OPTIONS,POST,GET");
-    resp->setContentTypeCode(CT_APPLICATION_JSON);
-    callback(resp);
-}
-
-void UserController::getByIdHeaders(const HttpRequestPtr& req, function<void(const HttpResponsePtr&)>&& callback, string id) {
-    Json::Value response;
-    auto resp = HttpResponse::newHttpJsonResponse(response);
-    resp->setStatusCode(k200OK);
-    resp->addHeader("Access-Control-Allow-Origin", "*");
-    resp->addHeader("Access-Control-Allow-Headers", "Content-Type");
-    resp->addHeader("Access-Control-Allow-Methods", "OPTIONS,DELETE,PUT,GET");
-    resp->setContentTypeCode(CT_APPLICATION_JSON);
-    callback(resp);
-}
-
 void UserController::getUsers(const HttpRequestPtr& req, function<void(const HttpResponsePtr&)>&& callback)
 {
     LOG_DEBUG << "Received request: " << req->methodString() << " " << req->path();
-
     connect();
 
     if (client) {
@@ -108,10 +85,11 @@ void UserController::getUsers(const HttpRequestPtr& req, function<void(const Htt
     }
 }
 
-
-
-void UserController::getUserById(const HttpRequestPtr& req,function<void(const HttpResponsePtr&)>&& callback, string id)
+void UserController::getUserById(const HttpRequestPtr& req, function<void(const HttpResponsePtr&)>&& callback, string id)
 {
+    LOG_DEBUG << "Received request: " << req->methodString() << " " << req->path();
+    connect();
+
     if (client) {
         Mapper<Users> mp(client);
         auto user = mp.findByPrimaryKey(id);
@@ -140,60 +118,72 @@ void UserController::getUserById(const HttpRequestPtr& req,function<void(const H
     }
 }
 
-void UserController::createUser(const HttpRequestPtr& req,function<void(const HttpResponsePtr&)>&& callback)
-{   
-    auto _client = drogon::app().getDbClient();
-    Mapper<Users> mp(_client);
+void UserController::createUser(const HttpRequestPtr& req, function<void(const HttpResponsePtr&)>&& callback)
+{
+    LOG_DEBUG << "Received request: " << req->methodString() << " " << req->path();
+    connect();
 
-    auto jsonBody = req->getJsonObject();
-    Users user;
-    user.setFirstName((*jsonBody)["first_name"].asString());
-    user.setLastName((*jsonBody)["last_name"].asString());
-    user.setEmail((*jsonBody)["email"].asString());
-    user.setIsDeleted(true);
-    string password = (*jsonBody)["password"].asString();
-    char salt[BCRYPT_HASHSIZE];
-    char hash[BCRYPT_HASHSIZE];
-    // Generate a salt with a work factor of 12
-    bcrypt_gensalt(12, salt);
-    // Hash the password using the generated salt
-    if (bcrypt_hashpw(password.c_str(), salt, hash) == 0) {
-       cout << "Password hashed successfully: " << hash <<endl;
-        user.setPassword(hash);
-    } else {
-       cerr << "Failed to hash password" <<endl;
-    }
-    auto currDate = trantor::Date::now();
-    cout << currDate.toDbString() <<endl;
-    user.setCreatedAt(currDate);
+    if (client) {
+        Mapper<Users> mp(client);
 
-    try {
-        // Save the new user to the database
-        auto result = mp.insertFuture(user);
-        if (result.wait_for(std::chrono::seconds(1)) ==future_status::ready) {
-            auto r = result.get();
-            Json::Value response;
-            response["user"] = r.toJson();
-            auto resp = HttpResponse::newHttpJsonResponse(response);
-            resp->setStatusCode(k201Created);
-            resp->setContentTypeCode(CT_APPLICATION_JSON);
-            callback(resp);
+        auto jsonBody = req->getJsonObject();
+        Users user;
+        user.setFirstName((*jsonBody)["first_name"].asString());
+        user.setLastName((*jsonBody)["last_name"].asString());
+        user.setEmail((*jsonBody)["email"].asString());
+        user.setIsDeleted(true);
+        string password = (*jsonBody)["password"].asString();
+        char salt[BCRYPT_HASHSIZE];
+        char hash[BCRYPT_HASHSIZE];
+        // Generate a salt with a work factor of 12
+        bcrypt_gensalt(12, salt);
+        // Hash the password using the generated salt
+        if (bcrypt_hashpw(password.c_str(), salt, hash) == 0) {
+            cout << "Password hashed successfully: " << hash <<endl;
+            user.setPassword(hash);
         } else {
-           cerr << "Error: future not ready" <<endl;
+            cerr << "Failed to hash password" <<endl;
         }
-    }
-    catch (const exception& e) {
-        // Code to handle the exception
-       cerr << "Exception caught: " << typeid(e).name() << " - " << e.what() <<endl;
+        auto currDate = trantor::Date::now();
+        cout << currDate.toDbString() <<endl;
+        user.setCreatedAt(currDate);
+
+        try {
+            // Save the new user to the database
+            auto result = mp.insertFuture(user);
+            if (result.wait_for(std::chrono::seconds(1)) ==future_status::ready) {
+                auto r = result.get();
+                Json::Value response;
+                response["user"] = r.toJson();
+                auto resp = HttpResponse::newHttpJsonResponse(response);
+                resp->setStatusCode(k201Created);
+                resp->setContentTypeCode(CT_APPLICATION_JSON);
+                callback(resp);
+            } else {
+                cerr << "Error: future not ready" << endl;
+            }
+        }
+        catch (const exception& e) {
+            // Code to handle the exception
+            cerr << "Exception caught: " << typeid(e).name() << " - " << e.what() <<endl;
+        }
+
+        Json::Value response;
+        response["user"] = "result";
+        auto resp= HttpResponse::newHttpJsonResponse(response);
+        resp->setStatusCode(k200OK);
+        resp->setContentTypeCode(CT_APPLICATION_JSON);
+        resp->addHeader("Access-Control-Allow-Origin", "*");
+        callback(resp);
+    } else {
+        Json::Value error;
+        error["error"] = "Unable to connect to database";
+        auto resp=HttpResponse::newHttpJsonResponse(error);
+        resp->setStatusCode(k500InternalServerError);
+        resp->addHeader("Access-Control-Allow-Origin", "*");
+        callback(resp);
     }
 
-    Json::Value response;
-    response["user"] = "result";
-    auto resp = HttpResponse::newHttpJsonResponse(response);
-    resp->setStatusCode(k200OK);
-    resp->setContentTypeCode(CT_APPLICATION_JSON);
-    resp->addHeader("Access-Control-Allow-Origin", "*");
-    callback(resp);
 }
 
 void UserController::updateUserById(const HttpRequestPtr& req,function<void(const HttpResponsePtr&)>&& callback, string id)
