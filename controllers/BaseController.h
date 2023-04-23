@@ -10,13 +10,13 @@ using namespace drogon;
 class BaseController
 {
     public:
-        void getHeaders(
+        static void getHeaders(
             const HttpRequestPtr& req,
             function<void(const HttpResponsePtr&)>&& callback);
-        void getByIdHeaders(
+        static void getByIdHeaders(
             const HttpRequestPtr& req,
             function<void(const HttpResponsePtr&)>&& callback,
-            string id);
+            const string& userId);
         static shared_ptr<HttpResponse> handleResponse(
             const Json::Value& responseData, HttpStatusCode statusCode)
         {

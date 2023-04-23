@@ -13,7 +13,9 @@ void BaseController::getHeaders(
     callback(resp);
 }
 
-void BaseController::getByIdHeaders(const HttpRequestPtr& req, function<void(const HttpResponsePtr&)>&& callback, string id)
+void BaseController::getByIdHeaders(
+    const HttpRequestPtr& req,
+    function<void(const HttpResponsePtr&)>&& callback, const string& userId)
 {
     Json::Value response;
     auto resp = HttpResponse::newHttpJsonResponse(response);
