@@ -18,7 +18,8 @@ void UserController::connect()
     }
 }
 
-void UserController::getUsers(const HttpRequestPtr& req, function<void(const HttpResponsePtr&)>&& callback)
+void UserController::getUsers(
+    const HttpRequestPtr& req, function<void(const HttpResponsePtr&)>&& callback)
 {
     LOG_DEBUG << "Received request: " << req->methodString() << " " << req->path();
     connect();
@@ -48,7 +49,6 @@ void UserController::getUsers(const HttpRequestPtr& req, function<void(const Htt
                            .limit(limit)
                            .offset(offset)
                            .findAll();
-            Json::Value response;
             Json::Value usersJson(Json::arrayValue);
             for (const auto& user : users) {
                 Json::Value userJson;
@@ -60,32 +60,30 @@ void UserController::getUsers(const HttpRequestPtr& req, function<void(const Htt
                 userJson["updated_at"] = user.getValueOfUpdatedAt().toDbString();
                 usersJson.append(userJson);
             }
-            response["results"] = usersJson;
-            auto resp = HttpResponse::newHttpJsonResponse(response);
-            resp->setStatusCode(k200OK);
-            resp->addHeader("Access-Control-Allow-Origin", "*");
-            callback(resp);
-
-
+            Json::Value userResults;
+            userResults["results"] = usersJson;
+            shared_ptr<HttpResponse> response = handleResponse(
+                usersJson, k200OK);
+            callback(response);
         } catch (const exception &e) {
             Json::Value error;
             error["error"] = e.what();
-            auto resp=HttpResponse::newHttpJsonResponse(error);
-            resp->setStatusCode(k500InternalServerError);
-            resp->addHeader("Access-Control-Allow-Origin", "*");
-            callback(resp);
+            shared_ptr<HttpResponse> response = handleResponse(
+                error, k500InternalServerError);
+            callback(response);
         }
     } else {
         Json::Value error;
         error["error"] = "Unable to connect to database";
-        auto resp=HttpResponse::newHttpJsonResponse(error);
-        resp->setStatusCode(k500InternalServerError);
-        resp->addHeader("Access-Control-Allow-Origin", "*");
-        callback(resp);
+        shared_ptr<HttpResponse> response = handleResponse(
+            error, k500InternalServerError);
+        callback(response);
     }
 }
 
-void UserController::getUserById(const HttpRequestPtr& req, function<void(const HttpResponsePtr&)>&& callback, string id)
+void UserController::getUserById(
+    const HttpRequestPtr& req,
+    function<void(const HttpResponsePtr&)>&& callback, string id)
 {
     LOG_DEBUG << "Received request: " << req->methodString() << " " << req->path();
     connect();
@@ -102,23 +100,20 @@ void UserController::getUserById(const HttpRequestPtr& req, function<void(const 
         userJson["email"] = user.getValueOfEmail();
         usersJson.append(userJson);
 
-        auto resp=HttpResponse::newHttpJsonResponse(usersJson);
-        resp->setStatusCode(k200OK);
-        resp->setContentTypeCode(CT_APPLICATION_JSON);
-        resp->addHeader("Access-Control-Allow-Origin", "*");
-        callback(resp);
+        shared_ptr<HttpResponse> response = handleResponse(
+            usersJson, k200OK);
+        callback(response);
     } else {
         Json::Value error;
         error["error"] = "Unable to connect to database";
-        auto resp=HttpResponse::newHttpJsonResponse(error);
-        resp->setStatusCode(k500InternalServerError);
-        resp->setContentTypeCode(CT_APPLICATION_JSON);
-        resp->addHeader("Access-Control-Allow-Origin", "*");
-        callback(resp);
+        shared_ptr<HttpResponse> response = handleResponse(
+            error, k500InternalServerError);
+        callback(response);
     }
 }
 
-void UserController::createUser(const HttpRequestPtr& req, function<void(const HttpResponsePtr&)>&& callback)
+void UserController::createUser(
+    const HttpRequestPtr& req, function<void(const HttpResponsePtr&)>&& callback)
 {
     LOG_DEBUG << "Received request: " << req->methodString() << " " << req->path();
     connect();
@@ -138,34 +133,36 @@ void UserController::createUser(const HttpRequestPtr& req, function<void(const H
         // Generate a salt with a work factor of 12
         bcrypt_gensalt(12, salt);
         // Hash the password using the generated salt
-        if (bcrypt_hashpw(password.c_str(), salt, hash) == 0) {
+        if (bcrypt_hashpw(password.c_str(), salt, hash) == 0)
+        {
             cout << "Password hashed successfully: " << hash <<endl;
             user.setPassword(hash);
-        } else {
+        }
+        else
+        {
             cerr << "Failed to hash password" <<endl;
         }
         auto currDate = trantor::Date::now();
-        cout << currDate.toDbString() <<endl;
         user.setCreatedAt(currDate);
 
-        try {
-            // Save the new user to the database
+        try
+        {
             auto result = mp.insertFuture(user);
-            if (result.wait_for(std::chrono::seconds(1)) ==future_status::ready) {
+            if (result.wait_for(std::chrono::seconds(1)) == future_status::ready)
+            {
                 auto r = result.get();
-                Json::Value response;
-                response["user"] = r.toJson();
-                auto resp = HttpResponse::newHttpJsonResponse(response);
-                resp->setStatusCode(k201Created);
-                resp->setContentTypeCode(CT_APPLICATION_JSON);
+                auto resp = handleResponse(r.toJson(), k201Created);
                 callback(resp);
-            } else {
+            }
+            else
+            {
                 cerr << "Error: future not ready" << endl;
             }
         }
-        catch (const exception& e) {
-            // Code to handle the exception
-            cerr << "Exception caught: " << typeid(e).name() << " - " << e.what() <<endl;
+        catch (const exception& e)
+        {
+            cerr << "Exception caught: " << typeid(e).name() << " - " << e.what() << endl;
+
         }
 
         Json::Value response;
@@ -178,15 +175,16 @@ void UserController::createUser(const HttpRequestPtr& req, function<void(const H
     } else {
         Json::Value error;
         error["error"] = "Unable to connect to database";
-        auto resp=HttpResponse::newHttpJsonResponse(error);
-        resp->setStatusCode(k500InternalServerError);
-        resp->addHeader("Access-Control-Allow-Origin", "*");
-        callback(resp);
+        shared_ptr<HttpResponse> response = handleResponse(
+            error, k500InternalServerError);
+        callback(response);
     }
 
 }
 
-void UserController::updateUserById(const HttpRequestPtr& req,function<void(const HttpResponsePtr&)>&& callback, string id)
+void UserController::updateUserById(
+    const HttpRequestPtr& req,
+    function<void(const HttpResponsePtr&)>&& callback, string id)
 {
     char salt[BCRYPT_HASHSIZE];
     char hash[BCRYPT_HASHSIZE];
@@ -211,46 +209,54 @@ void UserController::updateUserById(const HttpRequestPtr& req,function<void(cons
     user.setEmail(email);
 
     // Hash the password using the generated salt
-    if (bcrypt_hashpw(password.c_str(), salt, hash) == 0) {
+    if (bcrypt_hashpw(password.c_str(), salt, hash) == 0)
+    {
         cout << "Password hashed successfully: " << hash <<endl;
         user.setPassword(hash);
-    } else {
+    }
+    else
+    {
         cerr << "Failed to hash password" <<endl;
     }
 
     // Update the user in the database
     auto result = mp.update(user);
-    
-    Json::Value response;
-    response["user"] = user.toJson();
-    auto resp = HttpResponse::newHttpJsonResponse(response);
-    resp->setStatusCode(k200OK);
-    resp->setContentTypeCode(CT_APPLICATION_JSON);
-    resp->addHeader("Access-Control-Allow-Origin", "*");
-    callback(resp);
+    shared_ptr<HttpResponse> response = handleResponse(
+        user.toJson(), k200OK);
+    callback(response);
 }
 
 
-void UserController::deleteUserById(const HttpRequestPtr& req,
-                               function<void(const HttpResponsePtr&)>&& callback,
-                               string userId) {
-     Mapper<Users> mp(client);
+void UserController::deleteUserById(
+    const HttpRequestPtr& req,
+    function<void(const HttpResponsePtr&)>&& callback, const string& userId)
+{
+    if (client)
+    {
+        Mapper<Users> mp(client);
+        auto user = mp.deleteByPrimaryKey(userId);
 
-    auto user = mp.deleteByPrimaryKey(userId);
-    
-    if (user) {
-        auto resp = HttpResponse::newHttpResponse();
-        resp->setStatusCode(k204NoContent);
-        resp->setContentTypeCode(CT_APPLICATION_JSON);
-        resp->addHeader("Access-Control-Allow-Origin", "*");
-        callback(resp);
-    } else {
-        Json::Value response;
-        response["error"] = "Record not found";
-        auto resp = HttpResponse::newHttpJsonResponse(response);
-        resp->setStatusCode(k400BadRequest);
-        resp->setContentTypeCode(CT_APPLICATION_JSON);
-        resp->addHeader("Access-Control-Allow-Origin", "*");
-        callback(resp);
+        if (user)
+        {
+            auto resp = HttpResponse::newHttpResponse();
+            resp->setStatusCode(k204NoContent);
+            resp->setContentTypeCode(CT_APPLICATION_JSON);
+            resp->addHeader("Access-Control-Allow-Origin", "*");
+            callback(resp);
+        }
+        else {
+            Json::Value error;
+            error["error"] = "Record not found";
+            shared_ptr<HttpResponse> response = handleResponse(
+                error, k400BadRequest);
+            callback(response);
+        }
+    }
+    else {
+        Json::Value error;
+        error["error"] = "Unable to connect to database";
+        shared_ptr<HttpResponse> response = handleResponse(
+            error, k500InternalServerError);
+        callback(response);
     }
 }
