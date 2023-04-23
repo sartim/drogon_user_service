@@ -30,19 +30,29 @@ class UserController : public HttpController<UserController, false>, public Base
   
   public:
     // Get a list of all users
-    void getUsers(const HttpRequestPtr& req, function<void(const HttpResponsePtr&)>&& callback);
+    void getUsers(
+        const HttpRequestPtr& req,
+        function<void(const HttpResponsePtr&)>&& callback);
 
     // Get a user by their ID
-    void getUserById(const HttpRequestPtr& req, function<void(const HttpResponsePtr&)>&& callback, string id);
+    void getUserById(
+        const HttpRequestPtr& req,
+        function<void(const HttpResponsePtr&)>&& callback, string id);
 
     // Create a new user
-    void createUser(const HttpRequestPtr& req, function<void(const HttpResponsePtr&)>&& callback);
+    void createUser(
+        const HttpRequestPtr& req,
+        function<void(const HttpResponsePtr&)>&& callback);
 
     // Update a user by their ID
-    void updateUserById(const HttpRequestPtr& req, function<void(const HttpResponsePtr&)>&& callback, string id);
+    void updateUserById(
+        const HttpRequestPtr& req,
+        function<void(const HttpResponsePtr&)>&& callback, const string& id);
 
     // Delete a user by their ID
-    void deleteUserById(const HttpRequestPtr& req, function<void(const HttpResponsePtr&)>&& callback, string id);
+    void deleteUserById(
+        const HttpRequestPtr& req,
+        function<void(const HttpResponsePtr&)>&& callback, const string& id);
 
   private:
     drogon::orm::DbClientPtr client;

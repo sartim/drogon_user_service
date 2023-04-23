@@ -184,46 +184,61 @@ void UserController::createUser(
 
 void UserController::updateUserById(
     const HttpRequestPtr& req,
-    function<void(const HttpResponsePtr&)>&& callback, string id)
+    function<void(const HttpResponsePtr&)>&& callback, const string& userId)
 {
-    char salt[BCRYPT_HASHSIZE];
-    char hash[BCRYPT_HASHSIZE];
+    LOG_DEBUG << "Received request: " << req->methodString() << " " << req->path();
+    connect();
 
-    // Generate a salt with a work factor of 12
-    bcrypt_gensalt(12, salt);
-
-    Mapper<Users> mp(client);
-
-    auto jsonBody = req->getJsonObject();
-    string firstName = jsonBody->get("first_name", "").asString();
-    string lastName = jsonBody->get("last_name", "").asString();
-    string email = jsonBody->get("email", "").asString();
-    string password = jsonBody->get("password", "").asString();
-
-    Users user;
-
-    user.setId(id);
-    user.setFirstName(firstName);
-    user.setLastName(lastName);
-    user.setEmail(email);
-    user.setEmail(email);
-
-    // Hash the password using the generated salt
-    if (bcrypt_hashpw(password.c_str(), salt, hash) == 0)
+    if (client)
     {
-        cout << "Password hashed successfully: " << hash <<endl;
-        user.setPassword(hash);
+        char salt[BCRYPT_HASHSIZE];
+        char hash[BCRYPT_HASHSIZE];
+
+        // Generate a salt with a work factor of 12
+        bcrypt_gensalt(12, salt);
+
+        Mapper<Users> mp(client);
+
+        auto jsonBody = req->getJsonObject();
+        string firstName = jsonBody->get("first_name", "").asString();
+        string lastName = jsonBody->get("last_name", "").asString();
+        string email = jsonBody->get("email", "").asString();
+        string password = jsonBody->get("password", "").asString();
+
+        Users user;
+
+        user.setId(userId);
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setEmail(email);
+        user.setEmail(email);
+
+        // Hash the password using the generated salt
+        if (bcrypt_hashpw(password.c_str(), salt, hash) == 0)
+        {
+            cout << "Password hashed successfully: " << hash <<endl;
+            user.setPassword(hash);
+        }
+        else
+        {
+            cerr << "Failed to hash password" <<endl;
+        }
+
+        // Update the user in the database
+        auto result = mp.update(user);
+        shared_ptr<HttpResponse> response = handleResponse(
+            user.toJson(), k200OK);
+        callback(response);
     }
     else
     {
-        cerr << "Failed to hash password" <<endl;
+        Json::Value error;
+        error["error"] = "Unable to connect to database";
+        shared_ptr<HttpResponse> response = handleResponse(
+            error, k500InternalServerError);
+        callback(response);
     }
 
-    // Update the user in the database
-    auto result = mp.update(user);
-    shared_ptr<HttpResponse> response = handleResponse(
-        user.toJson(), k200OK);
-    callback(response);
 }
 
 
@@ -252,7 +267,8 @@ void UserController::deleteUserById(
             callback(response);
         }
     }
-    else {
+    else
+    {
         Json::Value error;
         error["error"] = "Unable to connect to database";
         shared_ptr<HttpResponse> response = handleResponse(
