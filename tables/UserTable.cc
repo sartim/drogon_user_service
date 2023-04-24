@@ -2,10 +2,11 @@
 #include <iostream>
 #include "UserTable.h"
 
+using namespace std;
 using namespace drogon;
 using namespace drogon::orm;
 
-const std::string USER_TABLE_NAME = "users";
+const string USER_TABLE_NAME = "users";
 
 void UserTable::create() {
     try {
