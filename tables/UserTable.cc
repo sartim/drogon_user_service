@@ -7,16 +7,7 @@ using namespace drogon::orm;
 
 const std::string USER_TABLE_NAME = "users";
 
-void UserTable::connect()
-{
-    if (client == nullptr) {
-        client = drogon::app().getDbClient();
-    }
-}
-
 void UserTable::create() {
-    connect();
-
     try {
         auto sql = "CREATE TABLE IF NOT EXISTS public."+ USER_TABLE_NAME +" ("
             "id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,"
