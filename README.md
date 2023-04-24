@@ -1,14 +1,14 @@
 # Drogon User Service
 
-User service using Drogon Framework. Make sure to add models.json and config.json.
+User service running on Drogon Framework which handles RBAC management. Make sure to add models.json and config.json.
 
 ## Requirements
 
-    * [Drogon](https://github.com/drogonframework/drogon)
-    * [PostgreSQL](https://www.postgresql.org)
-    * [JWT-CPP](https://github.com/Thalhammer/jwt-cpp)
-    * [Bcrypt](https://github.com/rg3/bcrypt.git)
-    * [OpenSSL](https://github.com/openssl/openssl.git)
+* [Drogon](https://github.com/drogonframework/drogon)
+* [PostgreSQL](https://www.postgresql.org)
+* [JWT-CPP](https://github.com/Thalhammer/jwt-cpp)
+* [Bcrypt](https://github.com/rg3/bcrypt.git)
+* [OpenSSL](https://github.com/openssl/openssl.git)
 
 ## Setup bcrypt
 
