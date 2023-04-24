@@ -1,6 +1,10 @@
-#include <drogon/HttpAppFramework.h>
 #include "controllers/UserController.h"
+#include "tables/PermissionTable.h"
+#include "tables/RolePermissionTable.h"
+#include "tables/RoleTable.h"
+#include "tables/UserPermissionTable.h"
 #include "tables/UserTable.h"
+#include <drogon/HttpAppFramework.h>
 
 using namespace std;
 using namespace drogon;
@@ -10,6 +14,22 @@ void createTables()
     // User table
     UserTable userTable;
     userTable.create();
+
+    // Role  table
+    RoleTable roleTable;
+    roleTable.create();
+
+    // Permission  table
+    PermissionTable permissionTable;
+    permissionTable.create();
+
+    // User permission  table
+    UserPermissionTable userPermissionTable;
+    userPermissionTable.create();
+
+    // Role permission  table
+    RolePermissionTable rolePermissionTable;
+    rolePermissionTable.create();
 }
 
 void registerRoutes()
