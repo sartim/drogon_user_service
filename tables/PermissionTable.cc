@@ -6,7 +6,7 @@ using namespace std;
 using namespace drogon;
 using namespace drogon::orm;
 
-const string PERMISSION_TABLE_NAME = "roles";
+const string PERMISSION_TABLE_NAME = "permissions";
 
 void PermissionTable::create() {
   try {
