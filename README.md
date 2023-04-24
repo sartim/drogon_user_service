@@ -1,4 +1,4 @@
-# Drogon User Service
+# User Service
 
 User service running on Drogon Framework which handles RBAC management. Make sure to add models.json and config.json.
 
