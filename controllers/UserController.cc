@@ -21,8 +21,11 @@ void UserController::connect()
 void UserController::getUsers(
     const HttpRequestPtr& req, function<void(const HttpResponsePtr&)>&& callback)
 {
-    LOG_DEBUG << "Received request: " << req->methodString() << " " << req->path();
-    connect();
+    string method = req->methodString();
+    string reqPath = req->path();
+    LOG_DEBUG << "Received request: " << method << " " << req->path();
+
+    connect(); // connect to db
 
     if (client) {
         try {
@@ -85,8 +88,11 @@ void UserController::getUserById(
     const HttpRequestPtr& req,
     function<void(const HttpResponsePtr&)>&& callback, string id)
 {
-    LOG_DEBUG << "Received request: " << req->methodString() << " " << req->path();
-    connect();
+    string method = req->methodString();
+    string reqPath = req->path();
+    LOG_DEBUG << "Received request: " << method << " " << req->path();
+
+    connect(); // connect to db
 
     if (client) {
         Mapper<Users> mp(client);
@@ -115,8 +121,11 @@ void UserController::getUserById(
 void UserController::createUser(
     const HttpRequestPtr& req, function<void(const HttpResponsePtr&)>&& callback)
 {
-    LOG_DEBUG << "Received request: " << req->methodString() << " " << req->path();
-    connect();
+    string method = req->methodString();
+    string reqPath = req->path();
+    LOG_DEBUG << "Received request: " << method << " " << req->path();
+
+    connect(); // connect to db
 
     if (client) {
         Mapper<Users> mp(client);
@@ -148,21 +157,15 @@ void UserController::createUser(
         try
         {
             auto result = mp.insertFuture(user);
-            if (result.wait_for(std::chrono::seconds(1)) == future_status::ready)
-            {
-                auto r = result.get();
-                auto resp = handleResponse(r.toJson(), k201Created);
-                callback(resp);
-            }
-            else
-            {
-                cerr << "Error: future not ready" << endl;
-            }
+            auto r = result.get();
+            auto resp = handleResponse(r.toJson(), k201Created);
+            callback(resp);
         }
         catch (const exception& e)
         {
-            cerr << "Exception caught: " << typeid(e).name() << " - " << e.what() << endl;
-
+            cerr 
+            << "Exception caught: " 
+            << typeid(e).name() << " - " << e.what() << endl;
         }
 
         Json::Value response;
@@ -186,8 +189,11 @@ void UserController::updateUserById(
     const HttpRequestPtr& req,
     function<void(const HttpResponsePtr&)>&& callback, const string& userId)
 {
-    LOG_DEBUG << "Received request: " << req->methodString() << " " << req->path();
-    connect();
+    string method = req->methodString();
+    string reqPath = req->path();
+    LOG_DEBUG << "Received request: " << method << " " << req->path();
+
+    connect(); // connect to db
 
     if (client)
     {
@@ -246,6 +252,12 @@ void UserController::deleteUserById(
     const HttpRequestPtr& req,
     function<void(const HttpResponsePtr&)>&& callback, const string& userId)
 {
+    string method = req->methodString();
+    string reqPath = req->path();
+    LOG_DEBUG << "Received request: " << method << " " << req->path();
+
+    connect(); // connect to db
+
     if (client)
     {
         Mapper<Users> mp(client);

@@ -49,13 +49,14 @@ void AuthController::asyncHandleHttpRequest(const HttpRequestPtr& req,
         }
 
         // Generate token for user found here and return as json
-        const string secretKey = drogon::app().getCustomConfig()["secret_key"].asString();
+        auto config = drogon::app().getCustomConfig()["secret_key"];
+        const string secretKey = config.asString();
         string jwt = generateJWT(secretKey, email);
 
         Json::Value response;
         response["token"] = jwt;
         response["user"] = usersJson;
-        auto resp= HttpResponse::newHttpJsonResponse(response);
+        auto resp = HttpResponse::newHttpJsonResponse(response);
         callback(resp);
     } else {
         Json::Value error;
