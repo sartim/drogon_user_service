@@ -34,12 +34,12 @@ void UserController::getUsers(
             int page = 1;
             auto page_it = query.find("page");
             if (page_it != query.end()) {
-                page =stoi(page_it->second);
+                page = stoi(page_it->second);
             }
             int page_size = 25;
             auto page_size_it = query.find("page_size");
             if (page_size_it != query.end()) {
-                page_size =stoi(page_size_it->second);
+                page_size = stoi(page_size_it->second);
             }
 
             // Calculate offset and limit
@@ -149,7 +149,7 @@ void UserController::createUser(
         }
         else
         {
-            cerr << "Failed to hash password" <<endl;
+            cerr << "Failed to hash password" << endl;
         }
         auto currDate = trantor::Date::now();
         user.setCreatedAt(currDate);
