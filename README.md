@@ -20,7 +20,7 @@ User service running on Drogon Framework which handles RBAC management. Make sur
     $ cd build
     $ cmake ..
     $ make
-    $ sudo make installl
+    $ sudo make install
     
 
 ## Install OpenSSL
