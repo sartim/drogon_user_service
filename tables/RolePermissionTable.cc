@@ -15,7 +15,8 @@ void RolePermissionTable::create() {
                "user_id UUID REFERENCES users(id),"
                "role_id UUID REFERENCES roles(id),"
                "created_at timestamp with time zone NOT NULL,"
-               "updated_at timestamp with time zone"
+               "updated_at timestamp with time zone,"
+               "PRIMARY KEY (user_id, role_id)"
                ")";
     if (client) {
       client->execSqlSync(sql);
