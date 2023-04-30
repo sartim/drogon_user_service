@@ -1,5 +1,4 @@
 #include <jwt-cpp/jwt.h>
-#include <sstream>
 #include <drogon/HttpController.h>
 #include <drogon/orm/Mapper.h>
 #include <drogon/HttpResponse.h>
@@ -20,7 +19,7 @@ string generateJWT(const string& secretKey, const string& email)
     .set_payload_claim("identity", jwt::claim(email))
     .set_issued_at(chrono::system_clock::now())
     .set_expires_at(chrono::system_clock::now() + chrono::seconds{3600})
-    .sign(jwt::algorithm::hs256{"secret"});
+    .sign(jwt::algorithm::hs256{secretKey});
     return token;
 }
 
