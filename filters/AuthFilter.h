@@ -1,9 +1,3 @@
-/**
- *
- *  AuthFilter.h
- *
- */
-
 #pragma once
 
 #include <drogon/HttpFilter.h>
