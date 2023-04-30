@@ -79,9 +79,9 @@ target_sources(${PROJECT_NAME}
 
 add_subdirectory(test)
 
-#find_package(OpenSSL REQUIRED)
-#target_include_directories(${PROJECT_NAME} PRIVATE ${OPENSSL_INCLUDE_DIR})
-#target_link_libraries(${PROJECT_NAME} PRIVATE ${OPENSSL_LIBRARIES})
+find_package(OpenSSL REQUIRED)
+target_include_directories(${PROJECT_NAME} PRIVATE ${OPENSSL_INCLUDE_DIR})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${OPENSSL_LIBRARIES})
 
 find_package(jwt-cpp REQUIRED)
 target_include_directories(${PROJECT_NAME} PRIVATE jwt-cpp)
