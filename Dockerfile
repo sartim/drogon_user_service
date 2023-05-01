@@ -31,10 +31,10 @@ WORKDIR /app
 COPY . /app
 
 # Build app
-RUN mkdir build && cd build && cmake .. && make
+RUN mkdir build && cd build && cmake .. && make && chmod +x drogon_user_service
 
 # Expose port 8000 for the app
 EXPOSE 8000
 
 # Start the app
-CMD ["/app/build/app"]
+CMD ["/app/build/drogon_user_service"]
