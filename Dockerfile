@@ -30,7 +30,7 @@ RUN cd jwt-cpp && mkdir build && cd build && cmake .. && make && make install
 RUN git clone https://github.com/rg3/bcrypt.git
 
 # Copy library files
-RUN cd bcrypt && make && cp bcrypt.a /usr/local/lib/ && cp bcrypt.h /usr/local/include/
+RUN cd bcrypt && make && cp bcrypt.a /usr/local/lib/libbcrypt.a && cp bcrypt.h /usr/local/include/
 
 # Copy the application code
 WORKDIR /app
