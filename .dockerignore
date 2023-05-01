@@ -561,9 +561,6 @@ FodyWeavers.xsd
 # Build path
 /build
 
-# Config.json
-config.json
-
 # IDE
 .vscode
 
