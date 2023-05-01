@@ -26,12 +26,6 @@ RUN git clone https://github.com/Thalhammer/jwt-cpp.git
 # Build and install the JWT-CPP library
 RUN cd jwt-cpp && mkdir build && cd build && cmake .. && make && make install
 
-# Clone Bcrypt repository
-RUN git clone https://github.com/rg3/bcrypt.git
-
-# Copy library files
-RUN cd bcrypt && make && cp bcrypt.a /usr/local/lib/libbcrypt.a && cp bcrypt.h /usr/local/include/
-
 # Copy the application code
 WORKDIR /app
 COPY . /app
