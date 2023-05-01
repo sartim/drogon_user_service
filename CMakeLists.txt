@@ -86,8 +86,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE ${OPENSSL_LIBRARIES})
 find_package(jwt-cpp REQUIRED)
 target_include_directories(${PROJECT_NAME} PRIVATE jwt-cpp)
 
-find_library(BCRYPT_LIBRARY bcrypt)
-target_link_libraries(${PROJECT_NAME} PRIVATE ${BCRYPT_LIBRARY})
+find_library(bcrypt /usr/local/lib/)
+target_link_libraries(${PROJECT_NAME} PRIVATE bcrypt)
 
 #find_package(AWSSDK CONFIG COMPONENTS core dynamodb kinesis s3 REQUIRED)
 #target_include_directories(${PROJECT_NAME} PRIVATE ${AWSSDK_INCLUDE_DIRS})
