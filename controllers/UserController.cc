@@ -1,10 +1,10 @@
-#include "bcrypt.h"
-#include <drogon/orm/Mapper.h>
-#include <drogon/HttpViewData.h>
 #include <drogon/HttpResponse.h>
 #include <drogon/HttpSimpleController.h>
-#include "../models/Users.h"
+#include <drogon/HttpViewData.h>
+#include <drogon/orm/Mapper.h>
 #include "UserController.h"
+#include "models/Users.h"
+#include "helpers/BCrypt.h"
 
 using namespace std;
 using namespace drogon;
@@ -137,20 +137,11 @@ void UserController::createUser(
         user.setEmail((*jsonBody)["email"].asString());
         user.setIsDeleted(true);
         string password = (*jsonBody)["password"].asString();
-        char salt[BCRYPT_HASHSIZE];
-        char hash[BCRYPT_HASHSIZE];
-        // Generate a salt with a work factor of 12
-        bcrypt_gensalt(12, salt);
-        // Hash the password using the generated salt
-        if (bcrypt_hashpw(password.c_str(), salt, hash) == 0)
-        {
-            cout << "Password hashed successfully: " << hash <<endl;
-            user.setPassword(hash);
-        }
-        else
-        {
-            cerr << "Failed to hash password" << endl;
-        }
+
+        std::string salt_key_b64 = BCrypt::hashPassword(password);
+        std::cout << "Hashed password: " << salt_key_b64 << std::endl;
+        user.setPassword(salt_key_b64);
+
         auto currDate = trantor::Date::now();
         user.setCreatedAt(currDate);
 
@@ -197,11 +188,11 @@ void UserController::updateUserById(
 
     if (client)
     {
-        char salt[BCRYPT_HASHSIZE];
-        char hash[BCRYPT_HASHSIZE];
+//        char salt[BCRYPT_HASHSIZE];
+//        char hash[BCRYPT_HASHSIZE];
 
         // Generate a salt with a work factor of 12
-        bcrypt_gensalt(12, salt);
+//        bcrypt_gensalt(12, salt);
 
         Mapper<Users> mp(client);
 
@@ -220,15 +211,15 @@ void UserController::updateUserById(
         user.setEmail(email);
 
         // Hash the password using the generated salt
-        if (bcrypt_hashpw(password.c_str(), salt, hash) == 0)
-        {
-            cout << "Password hashed successfully: " << hash <<endl;
-            user.setPassword(hash);
-        }
-        else
-        {
-            cerr << "Failed to hash password" <<endl;
-        }
+//        if (bcrypt_hashpw(password.c_str(), salt, hash) == 0)
+//        {
+//            cout << "Password hashed successfully: " << hash <<endl;
+//            user.setPassword(hash);
+//        }
+//        else
+//        {
+//            cerr << "Failed to hash password" <<endl;
+//        }
 
         // Update the user in the database
         auto result = mp.update(user);
