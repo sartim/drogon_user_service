@@ -37,3 +37,8 @@ User service running on Drogon Framework which handles RBAC management. Make sur
     $ cmake ..
     $ make
     $ ./drogoncore_user_service
+
+## Running with docker
+    
+    $ docker build -t drogon-user-service .
+    $ docker run --name drogon-user-service -d -p 8000:8000 drogon-user-service:latest
