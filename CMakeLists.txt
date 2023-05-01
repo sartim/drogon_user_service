@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(drogoncore_user_service CXX)
+project(drogon_user_service CXX)
 
 set(CMAKE_C_ARCHIVE_CREATE "<CMAKE_AR> qc <TARGET> <LINK_FLAGS> <OBJECTS>")
 set(CMAKE_C_ARCHIVE_FINISH "<CMAKE_RANLIB> -no_warning_for_no_symbols -c <TARGET>")
