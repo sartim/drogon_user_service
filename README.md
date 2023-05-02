@@ -40,5 +40,5 @@ User service running on Drogon Framework which handles RBAC management. Make sur
 
 ## Running with docker
     
-    $ docker build -t drogon-user-service .
+    $ docker build --build-arg DB_HOST=127.0.0.1 --build-arg DB_PORT=5432 --build-arg DB_NAME=db_name --build-arg DB_USER=username --build-arg DB_PASS=password -t drogon-user-service .
     $ docker run --name drogon-user-service -d -p 8000:8000 drogon-user-service:latest
