@@ -95,11 +95,16 @@ int main() {
     // Set log level
     app().setLogLevel(trantor::Logger::kTrace);
     int32_t port = 8000;
-    //Set HTTP listener address and port
+    // Set HTTP listener address and port
     app().addListener("0.0.0.0", port);
 
-    //Load config file
-    app().loadConfigFile("../config.json");
+    // Load config file
+    try {
+        app().loadConfigFile("../config.json");
+    } catch (const exception& e) {
+        cerr << "Exception caught: "
+             << typeid(e).name() << " - " << e.what() << endl;
+    }
 
     // Register routes
     registerRoutes();
