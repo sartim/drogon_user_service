@@ -1,4 +1,5 @@
 #include "controllers/UserController.h"
+#include "controllers/RoleController.h"
 #include "tables/PermissionTable.h"
 #include "tables/RolePermissionTable.h"
 #include "tables/RoleTable.h"
@@ -87,6 +88,40 @@ void registerRoutes()
     {Options, Get, Put, Delete, "AuthFilter"}
     );
 
+    // Register role routes
+    auto roleController = make_shared<RoleController>();
+    app().registerHandler(
+        "/api/v1/role",
+        [roleController](
+            const HttpRequestPtr& req,
+            function<void(const HttpResponsePtr&)>&& callback) {
+          if (req->method() == Options) {
+            roleController->getHeaders(req, move(callback));
+          } else if (req->method() == Get) {
+            roleController->getRoles(req, move(callback));
+          } else if (req->method() == Post) {
+            roleController->createRole(req, move(callback));
+          }
+        },
+        {Options, Get, Post, "AuthFilter"}
+    );
+    app().registerHandler(
+        "/api/v1/role/{id}",
+        [roleController](
+            const HttpRequestPtr& req,
+            function<void(const HttpResponsePtr&)>&& callback, const string& id) {
+          if (req->method() == Options) {
+            roleController->getByIdHeaders(req, move(callback), id);
+          } else if (req->method() == Get) {
+            roleController->getRoleById(req, move(callback), id);
+          } else if (req->method() == Put) {
+            roleController->updateRoleById(req, move(callback), id);;
+          } else if (req->method() == Delete) {
+            roleController->deleteRoleById(req, move(callback), id);;
+          }
+        },
+        {Options, Get, Put, Delete, "AuthFilter"}
+    );
 }
 
 
