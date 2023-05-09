@@ -188,12 +188,6 @@ void UserController::updateUserById(
 
     if (client)
     {
-//        char salt[BCRYPT_HASHSIZE];
-//        char hash[BCRYPT_HASHSIZE];
-
-        // Generate a salt with a work factor of 12
-//        bcrypt_gensalt(12, salt);
-
         Mapper<Users> mp(client);
 
         auto jsonBody = req->getJsonObject();
@@ -210,22 +204,27 @@ void UserController::updateUserById(
         user.setEmail(email);
         user.setEmail(email);
 
-        // Hash the password using the generated salt
-//        if (bcrypt_hashpw(password.c_str(), salt, hash) == 0)
-//        {
-//            cout << "Password hashed successfully: " << hash <<endl;
-//            user.setPassword(hash);
-//        }
-//        else
-//        {
-//            cerr << "Failed to hash password" <<endl;
-//        }
+        std::string salt_key_b64 = BCrypt::hashPassword(password);
+        std::cout << "Hashed password: " << salt_key_b64 << std::endl;
+        user.setPassword(salt_key_b64);
 
-        // Update the user in the database
-        auto result = mp.update(user);
-        shared_ptr<HttpResponse> response = handleResponse(
-            user.toJson(), k200OK);
-        callback(response);
+        auto currDate = trantor::Date::now();
+        user.setCreatedAt(currDate);
+
+        try
+        {
+            // Update the user in the database
+            auto result = mp.update(user);
+            shared_ptr<HttpResponse> response = handleResponse(
+                user.toJson(), k200OK);
+            callback(response);
+        }
+        catch (const exception& e)
+        {
+            cerr
+                << "Exception caught: "
+                << typeid(e).name() << " - " << e.what() << endl;
+        }
     }
     else
     {
@@ -235,7 +234,6 @@ void UserController::updateUserById(
             error, k500InternalServerError);
         callback(response);
     }
-
 }
 
 
