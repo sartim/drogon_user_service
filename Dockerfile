@@ -53,4 +53,4 @@ RUN mkdir build && cd build && cmake .. && make && chmod +x drogon_user_service
 EXPOSE 8000
 
 # Start the app
-CMD ["/app/build/drogon_user_service"]
+CMD ["/app/build/drogon_user_service", "--action=run-server"]
