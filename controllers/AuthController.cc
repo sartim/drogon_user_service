@@ -23,45 +23,63 @@ string generateJWT(const string& secretKey, const string& email)
     return token;
 }
 
-void AuthController::asyncHandleHttpRequest(const HttpRequestPtr& req,
-    function<void(const HttpResponsePtr&)>&& callback)
+void AuthController::asyncHandleHttpRequest(const HttpRequestPtr& req, function<void(const HttpResponsePtr&)>&& callback)
 {
+    string method = req->methodString();
+    string reqPath = req->path();
+    LOG_DEBUG << "Received request: " << method << " " << req->path();
+
     auto client = drogon::app().getDbClient();
-    if (client) {
-        auto jsonBody = req->getJsonObject();
-        auto email = (*jsonBody)["email"].asString();
-        auto password = (*jsonBody)["password"].asString();
+    if (client)
+    {
+      auto jsonBody = req->getJsonObject();
+      auto email = (*jsonBody)["email"].asString();
+      auto password = (*jsonBody)["password"].asString();
 
-        Mapper<Users> mp(client);
-        auto user = mp.findFutureBy(
-                Criteria(Users::Cols::_email, email));
-        auto result = user.get();
-        Json::Value usersJson(Json::arrayValue);
-        for (const auto& user : result)
-        {
-            Json::Value userJson;
-            userJson["id"] = user.getValueOfId();
-            userJson["first_name"] = user.getValueOfFirstName();
-            userJson["last_name"] = user.getValueOfLastName();
-            userJson["email"] = user.getValueOfEmail();
-            usersJson.append(userJson);
-        }
+      Mapper<Users> mp(client);
+      auto user = mp.findFutureBy(Criteria(Users::Cols::_email, email));
+      auto result = user.get();
+      Json::Value usersJson(Json::arrayValue);
 
-        // Generate token for user found here and return as json
-        auto config = drogon::app().getCustomConfig()["secret_key"];
-        const string secretKey = config.asString();
-        string jwt = generateJWT(secretKey, email);
-
-        Json::Value response;
-        response["token"] = jwt;
-        response["user"] = usersJson;
-        auto resp = HttpResponse::newHttpJsonResponse(response);
-        callback(resp);
-    } else {
+      if (result.empty())
+      {
+        // Invalid credentials
         Json::Value error;
-        error["error"] = "Unable to connect to database";
+        error["error"] = "Invalid credentials";
         auto resp = HttpResponse::newHttpJsonResponse(error);
-        resp->setStatusCode(k500InternalServerError);
+        resp->setStatusCode(k401Unauthorized);
         callback(resp);
+        return;
+      }
+
+      for (const auto& user : result)
+      {
+        Json::Value userJson;
+        userJson["id"] = user.getValueOfId();
+        userJson["first_name"] = user.getValueOfFirstName();
+        userJson["last_name"] = user.getValueOfLastName();
+        userJson["email"] = user.getValueOfEmail();
+        usersJson.append(userJson);
+      }
+
+      // Generate token for user found here and return as json
+      auto config = drogon::app().getCustomConfig()["secret_key"];
+      const string secretKey = config.asString();
+      string jwt = generateJWT(secretKey, email);
+
+      Json::Value response;
+      response["token"] = jwt;
+      response["user"] = usersJson;
+      auto resp = HttpResponse::newHttpJsonResponse(response);
+      callback(resp);
+    }
+    else
+    {
+      Json::Value error;
+      error["error"] = "Unable to connect to the database";
+      auto resp = HttpResponse::newHttpJsonResponse(error);
+      resp->setStatusCode(k500InternalServerError);
+      callback(resp);
     }
 }
+
