@@ -4,6 +4,7 @@
 #include <drogon/HttpResponse.h>
 #include "AuthController.h"
 #include "../models/Users.h"
+#include "helpers/BCrypt.h"
 
 using namespace std;
 using namespace drogon;
@@ -41,25 +42,34 @@ void AuthController::asyncHandleHttpRequest(const HttpRequestPtr& req, function<
       auto result = user.get();
       Json::Value usersJson(Json::arrayValue);
 
-      if (result.empty())
+      // Check to handle invalid credentials
+      Json::Value error;
+      error["error"] = "Invalid credentials";
+
+      if (!result.empty())
       {
-        // Invalid credentials
-        Json::Value error;
-        error["error"] = "Invalid credentials";
+        for (const auto& user : result)
+        {
+          string hashedPassword = user.getValueOfPassword();
+          bool isVerified = BCrypt::verifyPassword(password, hashedPassword);
+          if (!isVerified) {
+            auto resp = HttpResponse::newHttpJsonResponse(error);
+            resp->setStatusCode(k401Unauthorized);
+            callback(resp);
+            return;
+          }
+          Json::Value userJson;
+          userJson["id"] = user.getValueOfId();
+          userJson["first_name"] = user.getValueOfFirstName();
+          userJson["last_name"] = user.getValueOfLastName();
+          userJson["email"] = user.getValueOfEmail();
+          usersJson.append(userJson);
+        }
+      } else {
         auto resp = HttpResponse::newHttpJsonResponse(error);
         resp->setStatusCode(k401Unauthorized);
         callback(resp);
         return;
-      }
-
-      for (const auto& user : result)
-      {
-        Json::Value userJson;
-        userJson["id"] = user.getValueOfId();
-        userJson["first_name"] = user.getValueOfFirstName();
-        userJson["last_name"] = user.getValueOfLastName();
-        userJson["email"] = user.getValueOfEmail();
-        usersJson.append(userJson);
       }
 
       // Generate token for user found here and return as json
