@@ -124,9 +124,11 @@ void registerRoutes()
     );
 }
 
+void dropTables() {
 
-int main() {
+}
 
+void runServer() {
     // Set log level
     app().setLogLevel(trantor::Logger::kTrace);
     int32_t port = 8000;
@@ -147,6 +149,45 @@ int main() {
     // Run server
     LOG_INFO << "Server running on 127.0.0.1:" << port;
     app().run();
+}
+
+
+int main(int argc, char* argv[]) {
+    // Check if the correct number of command-line arguments is provided
+    if (argc != 2) {
+        std::cerr << "Usage: --action=run-server|create-tables|drop-tables" << std::endl;
+        return 1;
+    }
+
+    // Parse the command-line argument
+    std::string action = argv[1];
+
+    // Extract the action from the argument
+    size_t equalsPos = action.find('=');
+    if (equalsPos == std::string::npos || equalsPos == action.length() - 1) {
+        std::cerr << "Invalid argument format" << std::endl;
+        return 1;
+    }
+
+    std::string key = action.substr(0, equalsPos);
+    std::string value = action.substr(equalsPos + 1);
+
+    // Check the action and perform the corresponding operation
+    if (key == "--action") {
+        if (value == "run-server") {
+          runServer();
+        } else if (value == "create-tables") {
+          createTables();
+        } else if (value == "drop-tables") {
+          dropTables();
+        } else {
+          std::cerr << "Invalid action" << std::endl;
+          return 1;
+        }
+    } else {
+        std::cerr << "Invalid argument" << std::endl;
+        return 1;
+    }
 
     return 0;
 }
