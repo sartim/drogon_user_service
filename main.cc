@@ -151,11 +151,30 @@ void runServer() {
     app().run();
 }
 
+void createSuperUser() {
+    std::string first_name, last_name, email, password;
+
+    std::cout << "Enter first name: ";
+    std::cin >> first_name;
+
+    std::cout << "Enter last name: ";
+    std::cin >> last_name;
+
+    std::cout << "Enter email: ";
+    std::cin >> email;
+
+    std::cout << "Enter password: ";
+    std::cin >> password;
+
+    // TODO Save user to db
+
+    std::cout << first_name << " superuser created successfully!" << std::endl;
+}
 
 int main(int argc, char* argv[]) {
     // Check if the correct number of command-line arguments is provided
     if (argc != 2) {
-        std::cerr << "Usage: --action=run-server|create-tables|drop-tables" << std::endl;
+        std::cerr << "Usage: --action=run-server|create-tables|drop-tables|create-superuser" << std::endl;
         return 1;
     }
 
@@ -180,6 +199,8 @@ int main(int argc, char* argv[]) {
           createTables();
         } else if (value == "drop-tables") {
           dropTables();
+        } else if (value == "create-superuser") {
+          createSuperUser();
         } else {
           std::cerr << "Invalid action" << std::endl;
           return 1;
