@@ -6,18 +6,23 @@ using namespace drogon;
 
 bool verifyJWT(const std::string& secretKey, const std::string& token)
 {
-    auto decoded_token = jwt::decode(token);
+    if(token != "") {
+      auto decoded_token = jwt::decode(token);
 
-    auto verifier = jwt::verify()
-                      .allow_algorithm(jwt::algorithm::hs256{ secretKey })
-                      .with_issuer("auth0");
+      auto verifier = jwt::verify()
+                          .allow_algorithm(jwt::algorithm::hs256{ secretKey })
+                          .with_issuer("auth0");
 
-    try {
+      try {
         verifier.verify(decoded_token);
         return true;
-    }  catch (const std::exception& e) {
+      }  catch (const std::exception& e) {
         LOG_ERROR << "Failed to verify token " << e.what();
         return false;
+      }
+    } else {
+      LOG_ERROR << "Token missing " ;
+      return false;
     }
 }
 
@@ -28,14 +33,20 @@ void AuthFilter::doFilter(const HttpRequestPtr &req,
 {  
     const std::string token = req->getHeader("Authorization");
     const std::string secretKey = drogon::app().getCustomConfig()["secret_key"].asString();
-    if (verifyJWT(secretKey, token)) {
+    bool isVerified = verifyJWT(secretKey, token);
+    if (isVerified) {
         Json::Value error;
         error["error"] = "Unauthorized";
         auto response = drogon::HttpResponse::newHttpJsonResponse(error);
         response->setStatusCode(k401Unauthorized);
         fcb(response);
-    } else {
-        fccb();
+    } else if (!isVerified){
+        Json::Value error;
+        error["error"] = "Missing Authorization Header";
+        auto response = drogon::HttpResponse::newHttpJsonResponse(error);
+        response->setStatusCode(k401Unauthorized);
+        fcb(response);
     }
+    fccb();
 }
 
