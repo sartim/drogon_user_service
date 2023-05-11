@@ -1,21 +1,8 @@
 #!/bin/sh
 
-cat << EOF > config.json
-{
-  "secret_key": "${SECRET_KEY}",
-  "db_clients":[
-      {
-        "name":"default",
-        "rdbms": "postgresql",
-        "host": ${DB_HOST},
-        "port": ${DB_PORT},
-        "dbname": ${DB_NAME},
-        "user": ${DB_USER},
-        "passwd": ${DB_PASS},
-        "is_fast": false,
-        "connection_number": 1,
-        "filename": ""
-      }
-    ]
-}
+cat << EOF > .env
+SECRET_KEY=${SECRET_KEY}
+DB_NAME=${DB_NAME}
+DB_USER=${DB_USER}
+DB_PASSWORD=${DB_PASS}
 EOF
