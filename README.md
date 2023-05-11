@@ -10,6 +10,13 @@ User service running on Drogon Framework which handles RBAC management. Make sur
 * [Bcrypt](https://github.com/rg3/bcrypt.git)
 * [OpenSSL](https://github.com/openssl/openssl.git)
 
+## Create .env file
+
+    SECRET_KEY={SECRET_KEY}
+    DB_NAME={DB_NAME}
+    DB_USER={DB_USER}
+    DB_PASSWORD={DB_PASSWORD}
+
 ## Setup bcrypt
 
     $ sudo cp bcrypt.a /usr/local/lib/
