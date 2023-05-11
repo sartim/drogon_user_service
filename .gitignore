@@ -569,3 +569,6 @@ config.json
 
 # Dependencies
 /dependencies
+
+# Env
+.env
