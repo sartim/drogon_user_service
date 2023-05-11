@@ -1,3 +1,8 @@
+#include <iostream>
+#include <fstream>
+#include <map>
+#include <sstream>
+#include <stdexcept>
 #include "controllers/UserController.h"
 #include "controllers/RoleController.h"
 #include "tables/PermissionTable.h"
@@ -152,44 +157,118 @@ void runServer() {
 }
 
 void createSuperUser() {
-    std::string first_name, last_name, email, password;
+    string first_name, last_name, email, phone, password;
 
-    std::cout << "Enter first name: ";
-    std::cin >> first_name;
+    cout << "First Name: ";
+    cin >> first_name;
 
-    std::cout << "Enter last name: ";
-    std::cin >> last_name;
+    cout << "Last Name: ";
+    cin >> last_name;
 
-    std::cout << "Enter email: ";
-    std::cin >> email;
+    cout << "Email: ";
+    cin >> email;
 
-    std::cout << "Enter password: ";
-    std::cin >> password;
+    cout << "Phone: ";
+    cin >> phone;
+
+    cout << "Password: ";
+    cin >> password;
 
     // TODO Save user to db
 
-    std::cout << first_name << " superuser created successfully!" << std::endl;
+    cout << first_name << " superuser created successfully!" << endl;
+}
+
+map<string, string> loadEnvVariables(const string& filename) {
+    map<string, string> envVariables;
+
+    ifstream file(filename);
+    if (!file.is_open()) {
+        throw runtime_error("Failed to open .env file.");
+    }
+
+    string line;
+    while (getline(file, line)) {
+        stringstream lineStream(line);
+        string key, value;
+        if (getline(lineStream, key, '=') && getline(lineStream, value)) {
+          envVariables[key] = value;
+        }
+    }
+
+    file.close();
+
+    return envVariables;
+}
+
+void generateConfigFile() {
+    // Load environment variables from .env file
+    map<string, string> envVariables = loadEnvVariables(".env");
+    
+    // Create a JSON object
+    Json::Value config;
+    // Set the values for the variables from environment variables
+    string secretKey = envVariables["SECRET_KEY"];
+    string dbName = envVariables["DB_NAME"];
+    string user = envVariables["DB_USER"];
+    string password = envVariables["DB_PASSWORD"];
+
+    config["secret_key"] = secretKey;
+    config["db_clients"] = Json::Value(Json::arrayValue);
+    Json::Value& dbClients = config["db_clients"];
+
+    // Create a database client object
+    Json::Value dbClient;
+    dbClient["name"] = "default";
+    dbClient["rdbms"] = "postgresql";
+    dbClient["host"] = "127.0.0.1";
+    dbClient["port"] = 5432;
+    dbClient["dbname"] = dbName;
+    dbClient["user"] = user;
+    dbClient["passwd"] = password;
+    dbClient["is_fast"] = false;
+    dbClient["connection_number"] = 1;
+    dbClient["filename"] = "";
+
+    // Add the database client object to the array
+    dbClients.append(dbClient);
+
+    // Generate the JSON string
+    Json::StreamWriterBuilder writer;
+    writer["indentation"] = "    "; // 4 spaces for indentation
+    string jsonString = Json::writeString(writer, config);
+
+    // Write the JSON string to a file
+    ofstream outputFile("config.json");
+    outputFile << jsonString;
+    outputFile.close();
+
+    cout << "Configuration file generated successfully." << endl;
 }
 
 int main(int argc, char* argv[]) {
+
+    // Generate config file from .env
+    generateConfigFile();
+
     // Check if the correct number of command-line arguments is provided
     if (argc != 2) {
-        std::cerr << "Usage: --action=run-server|create-tables|drop-tables|create-superuser" << std::endl;
+        cerr << "Usage: --action=run-server|create-tables|drop-tables|create-superuser" << endl;
         return 1;
     }
 
     // Parse the command-line argument
-    std::string action = argv[1];
+    string action = argv[1];
 
     // Extract the action from the argument
     size_t equalsPos = action.find('=');
-    if (equalsPos == std::string::npos || equalsPos == action.length() - 1) {
-        std::cerr << "Invalid argument format" << std::endl;
+    if (equalsPos == string::npos || equalsPos == action.length() - 1) {
+        cerr << "Invalid argument format" << endl;
         return 1;
     }
 
-    std::string key = action.substr(0, equalsPos);
-    std::string value = action.substr(equalsPos + 1);
+    string key = action.substr(0, equalsPos);
+    string value = action.substr(equalsPos + 1);
 
     // Check the action and perform the corresponding operation
     if (key == "--action") {
@@ -202,11 +281,11 @@ int main(int argc, char* argv[]) {
         } else if (value == "create-superuser") {
           createSuperUser();
         } else {
-          std::cerr << "Invalid action" << std::endl;
+          cerr << "Invalid action" << endl;
           return 1;
         }
     } else {
-        std::cerr << "Invalid argument" << std::endl;
+        cerr << "Invalid argument" << endl;
         return 1;
     }
 
