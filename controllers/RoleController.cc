@@ -65,7 +65,7 @@ void RoleController::getRoles(
             Json::Value roleResults;
             roleResults["results"] = RolesJson;
             shared_ptr<HttpResponse> response = handleResponse(
-                RolesJson, k200OK);
+                roleResults, k200OK);
             callback(response);
         } catch (const exception &e) {
             Json::Value error;
@@ -123,6 +123,7 @@ void RoleController::createRole(
 {
     string method = req->methodString();
     string reqPath = req->path();
+
     LOG_DEBUG << "Received request: " << method << " " << req->path();
 
     connect(); // connect to db
@@ -131,6 +132,17 @@ void RoleController::createRole(
         Mapper<Roles> mp(client);
 
         auto jsonBody = req->getJsonObject();
+
+        // Check if jsonBody contains the required fields
+        if (!jsonBody || !(*jsonBody)["name"].isString() || !(*jsonBody)["description"].isString()) {
+            Json::Value error;
+            error["error"] = "Missing data in JSON body";
+            shared_ptr<HttpResponse> response = handleResponse(
+                error, k400BadRequest);
+            callback(response);
+            return;
+        }
+
         Roles role;
         role.setName((*jsonBody)["name"].asString());
         role.setDescription((*jsonBody)["description"].asString());
@@ -149,9 +161,9 @@ void RoleController::createRole(
         }
         catch (const exception& e)
         {
-            cerr 
-            << "Exception caught: " 
-            << typeid(e).name() << " - " << e.what() << endl;
+            cerr
+                << "Exception caught: "
+                << typeid(e).name() << " - " << e.what() << endl;
         }
 
         Json::Value response;
@@ -168,8 +180,8 @@ void RoleController::createRole(
             error, k500InternalServerError);
         callback(response);
     }
-
 }
+
 
 void RoleController::updateRoleById(
     const HttpRequestPtr& req,
