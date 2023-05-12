@@ -11,9 +11,13 @@
 #include "tables/UserPermissionTable.h"
 #include "tables/UserTable.h"
 #include <drogon/HttpAppFramework.h>
+#include "models/Users.h"
+#include "helpers/BCrypt.h"
 
 using namespace std;
 using namespace drogon;
+using namespace drogon::orm;
+using namespace drogon_model::drogon_user_service;
 
 void createTables()
 {
@@ -156,29 +160,6 @@ void runServer() {
     app().run();
 }
 
-void createSuperUser() {
-    string first_name, last_name, email, phone, password;
-
-    cout << "First Name: ";
-    cin >> first_name;
-
-    cout << "Last Name: ";
-    cin >> last_name;
-
-    cout << "Email: ";
-    cin >> email;
-
-    cout << "Phone: ";
-    cin >> phone;
-
-    cout << "Password: ";
-    cin >> password;
-
-    // TODO Save user to db
-
-    cout << first_name << " superuser created successfully!" << endl;
-}
-
 map<string, string> loadEnvVariables(const string& filename) {
     map<string, string> envVariables;
 
@@ -253,7 +234,10 @@ int main(int argc, char* argv[]) {
 
     // Check if the correct number of command-line arguments is provided
     if (argc != 2) {
-        cerr << "Usage: --action=run-server|create-tables|drop-tables|create-superuser" << endl;
+        cerr <<
+            "Usage: "
+            "--action=run-server|create-tables|drop-tables"
+             << endl;
         return 1;
     }
 
@@ -278,8 +262,6 @@ int main(int argc, char* argv[]) {
           createTables();
         } else if (value == "drop-tables") {
           dropTables();
-        } else if (value == "create-superuser") {
-          createSuperUser();
         } else {
           cerr << "Invalid action" << endl;
           return 1;
