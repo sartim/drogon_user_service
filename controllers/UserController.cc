@@ -137,11 +137,8 @@ void UserController::createUser(
         user.setEmail((*jsonBody)["email"].asString());
         user.setIsDeleted(true);
         string password = (*jsonBody)["password"].asString();
-
-        std::string salt_key_b64 = BCrypt::hashPassword(password);
-        std::cout << "Hashed password: " << salt_key_b64 << std::endl;
-        user.setPassword(salt_key_b64);
-
+        std::string hashedPassword = BCrypt::hashPassword(password);
+        user.setPassword(hashedPassword);
         auto currDate = trantor::Date::now();
         user.setCreatedAt(currDate);
 
