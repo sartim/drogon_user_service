@@ -14,7 +14,7 @@ using namespace drogon_model::drogon_user_service;
 void UserController::connect()
 {
     if (client == nullptr) {
-        client = drogon::app().getDbClient();
+        client = app().getDbClient();
     }
 }
 
@@ -137,7 +137,7 @@ void UserController::createUser(
         user.setEmail((*jsonBody)["email"].asString());
         user.setIsDeleted(true);
         string password = (*jsonBody)["password"].asString();
-        std::string hashedPassword = BCrypt::hashPassword(password);
+        string hashedPassword = BCrypt::hashPassword(password);
         user.setPassword(hashedPassword);
         auto currDate = trantor::Date::now();
         user.setCreatedAt(currDate);
@@ -201,8 +201,8 @@ void UserController::updateUserById(
         user.setEmail(email);
         user.setEmail(email);
 
-        std::string salt_key_b64 = BCrypt::hashPassword(password);
-        std::cout << "Hashed password: " << salt_key_b64 << std::endl;
+        string salt_key_b64 = BCrypt::hashPassword(password);
+        cout << "Hashed password: " << salt_key_b64 << endl;
         user.setPassword(salt_key_b64);
 
         auto currDate = trantor::Date::now();
