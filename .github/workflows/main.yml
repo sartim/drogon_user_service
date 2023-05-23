@@ -1,4 +1,4 @@
-name: Main pipeline
+name: build
 
 on:
   push:
@@ -18,3 +18,35 @@ jobs:
         - 5432:5432
     steps:
     - uses: actions/checkout@v3
+    - name: Setup CI/CD Server
+      run: |
+        apt-get update &&
+        apt-get install -y redis-server git &&
+        apt-get install -y cmake g++ gcc libjsoncpp-dev uuid-dev openssl &&
+        apt-get install -y libssl-dev zlib1g-dev libbz2-dev liblzma-dev &&
+        apt-get install -y postgresql postgresql-contrib &&
+        apt-get clean && rm -rf /var/lib/apt/lists/*
+    - name: Install Drogon Framework
+      run: | 
+        git clone https://github.com/drogonframework/drogon 
+        cd drogon && 
+        git submodule update --init && 
+        mkdir build && cd build && cmake .. && make && make install
+    - name: Install JWT CPP Library
+      run: |
+        git clone https://github.com/Thalhammer/jwt-cpp.git
+        cd jwt-cpp && mkdir build && cd build && cmake .. && make && make install
+    - name: Run Scripts
+      run: |
+        chmod +x scripts/create_dot_env.sh
+        ./scripts/create_dot_env.sh
+      env:
+        SECRET_KEY: ${{secrets.SECRET_KEY}}
+        DB_NAME: ${{secrets.DB_NAME}}
+        DB_USER: ${{secrets.DB_USER}}
+        DB_PASS: ${{secrets.DB_PASS}}
+    - name: Build
+      run: |
+        mkdir build && 
+        cd build && 
+        cmake .. && make
