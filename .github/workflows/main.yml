@@ -1,12 +1,11 @@
-name: Main branch pipeline
+name: Main pipeline
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  buld:
-    name: Main branch pipeline
+  build:
     runs-on: ubuntu-latest
     services:
       postgres:
