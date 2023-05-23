@@ -38,7 +38,7 @@ jobs:
         cd jwt-cpp && mkdir build && cd build && sudo cmake .. && sudo make && sudo make install
     - name: Run Scripts
       run: |
-        sudo chmod +x scripts/create_dot_env.sh
+        sudo chmod +x ./scripts/create_dot_env.sh
         ./scripts/create_dot_env.sh
       env:
         SECRET_KEY: ${{secrets.SECRET_KEY}}
