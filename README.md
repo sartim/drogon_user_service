@@ -1,5 +1,8 @@
 # User Service
 
+[![Language](https://img.shields.io/badge/language-cpp-green.svg)](https://github.com/sartim/drogon_user_service)
+[![Build Status](https://github.com/sartim/drogon_user_service/workflows/build/badge.svg)](https://github.com/sartim/drogon_user_service)
+
 User service running on Drogon Framework which handles RBAC management. Make sure to add models.json and config.json.
 
 ## Requirements
