@@ -20,24 +20,25 @@ jobs:
     - uses: actions/checkout@v3
     - name: Setup CI/CD Server
       run: |
-        apt-get update &&
-        apt-get install -y redis-server git &&
-        apt-get install -y cmake g++ gcc libjsoncpp-dev uuid-dev openssl &&
-        apt-get install -y libssl-dev zlib1g-dev libbz2-dev liblzma-dev &&
-        apt-get install -y postgresql postgresql-contrib
+        sudo apt-get update &&
+        sudo apt-get install -y redis-server git &&
+        sudo apt-get install -y cmake g++ gcc libjsoncpp-dev uuid-dev openssl &&
+        sudo apt-get install -y libssl-dev zlib1g-dev libbz2-dev liblzma-dev &&
+        sudo apt-get install -y postgresql postgresql-contrib &&
+        sudo  apt-get clean && sudo rm -rf /var/lib/apt/lists/*
     - name: Install Drogon Framework
       run: | 
         git clone https://github.com/drogonframework/drogon 
         cd drogon && 
         git submodule update --init && 
-        mkdir build && cd build && cmake .. && make && make install
+        sudo mkdir build && cd build && sudo cmake .. && sudo make && sudo make install
     - name: Install JWT CPP Library
       run: |
         git clone https://github.com/Thalhammer/jwt-cpp.git
-        cd jwt-cpp && mkdir build && cd build && cmake .. && make && make install
+        cd jwt-cpp && mkdir build && cd build && sudo cmake .. && sudo make && sudo make install
     - name: Run Scripts
       run: |
-        chmod +x scripts/create_dot_env.sh
+        sudo chmod +x scripts/create_dot_env.sh
         ./scripts/create_dot_env.sh
       env:
         SECRET_KEY: ${{secrets.SECRET_KEY}}
