@@ -104,6 +104,8 @@ void UserController::getUserById(
         userJson["first_name"] = user.getValueOfFirstName();
         userJson["last_name"] = user.getValueOfLastName();
         userJson["email"] = user.getValueOfEmail();
+        userJson["created_at"] = user.getValueOfCreatedAt().toDbString();
+        userJson["updated_at"] = user.getValueOfUpdatedAt().toDbString();
         usersJson.append(userJson);
 
         shared_ptr<HttpResponse> response = handleResponse(
