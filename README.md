@@ -22,8 +22,8 @@ User service running on Drogon Framework which handles RBAC management. Make sur
 
 ## Setup bcrypt
 
-    $ sudo cp bcrypt.a /usr/local/lib/
-    $ sudo cp bcrypt.h /usr/local/include/
+    $ cp bcrypt.a /usr/local/lib/
+    $ cp bcrypt.h /usr/local/include/
 
 ## Install jwt-cpp
 
@@ -38,7 +38,7 @@ User service running on Drogon Framework which handles RBAC management. Make sur
     $ cd openssl
     $ ./config shared no-ssl2
     $ make
-    $ sudo make install
+    $ make install
 
 
 ## Running server
