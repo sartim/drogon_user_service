@@ -44,7 +44,7 @@ COPY . /app
 
 # Run script.sh
 RUN chmod +x scripts/create_dot_env.sh
-RUN /app/script.sh
+# RUN /app/script.sh
 
 # Build app
 RUN mkdir build && cd build && cmake .. && make && chmod +x drogon_user_service
