@@ -42,9 +42,8 @@ RUN cd jwt-cpp && mkdir build && cd build && cmake .. && make && make install
 WORKDIR /app
 COPY . /app
 
-# Run script.sh
+# Run scripts
 RUN chmod +x scripts/create_dot_env.sh
-# RUN /app/script.sh
 
 # Build app
 RUN mkdir build && cd build && cmake .. && make && chmod +x drogon_user_service
