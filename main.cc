@@ -190,9 +190,11 @@ void generateConfigFile() {
     Json::Value config;
     // Set the values for the variables from environment variables
     string secretKey = envVariables["SECRET_KEY"];
+    string dbHost = envVariables["DB_HOST"];
     string dbName = envVariables["DB_NAME"];
     string user = envVariables["DB_USER"];
     string password = envVariables["DB_PASSWORD"];
+  
 
     config["secret_key"] = secretKey;
     config["db_clients"] = Json::Value(Json::arrayValue);
@@ -202,7 +204,7 @@ void generateConfigFile() {
     Json::Value dbClient;
     dbClient["name"] = "default";
     dbClient["rdbms"] = "postgresql";
-    dbClient["host"] = "127.0.0.1";
+    dbClient["host"] = dbHost;
     dbClient["port"] = 5432;
     dbClient["dbname"] = dbName;
     dbClient["user"] = user;
