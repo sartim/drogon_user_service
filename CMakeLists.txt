@@ -37,10 +37,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Drogon::Drogon)
 # ##############################################################################
 
 if (CMAKE_CXX_STANDARD LESS 17)
-    # With C++14, use boost to support any, string_view and filesystem
-    message(STATUS "use c++14")
-    find_package(Boost 1.61.0 REQUIRED)
-    target_link_libraries(${PROJECT_NAME} PUBLIC Boost::boost)
+    message(FATAL_ERROR "c++17 or higher is required")
 elseif (CMAKE_CXX_STANDARD LESS 20)
     message(STATUS "use c++17")
 else ()
@@ -53,7 +50,6 @@ aux_source_directory(plugins PLUGIN_SRC)
 aux_source_directory(models MODEL_SRC)
 aux_source_directory(tables TABLE_SRC)
 aux_source_directory(helpers HELPER_SRC)
-
 drogon_create_views(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/views
                     ${CMAKE_CURRENT_BINARY_DIR})
 # use the following line to create views with namespaces.
@@ -90,8 +86,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE ${OPENSSL_LIBRARIES})
 
 find_package(jwt-cpp REQUIRED)
 target_include_directories(${PROJECT_NAME} PRIVATE jwt-cpp)
-
 #find_package(AWSSDK CONFIG COMPONENTS core dynamodb kinesis s3 REQUIRED)
 #target_include_directories(${PROJECT_NAME} PRIVATE ${AWSSDK_INCLUDE_DIRS})
 #target_link_libraries(${PROJECT_NAME} PRIVATE ${AWSSDK_LIBRARIES})
-
