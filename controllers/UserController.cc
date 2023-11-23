@@ -14,7 +14,9 @@ using namespace drogon_model::drogon_user_service;
 void UserController::connect()
 {
     if (client == nullptr) {
-        client = app().getDbClient();
+        if (drogon::app().isRunning()) {
+            client = drogon::app().getDbClient();
+        };
     }
 }
 
