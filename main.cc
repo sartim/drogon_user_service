@@ -45,16 +45,19 @@ void createTables()
 void registerRoutes()
 {
     // Register root route
-    app().registerHandler(
+    drogon::app().registerHandler(
         "/", 
         [](
             const HttpRequestPtr& req, function<void (
                 const HttpResponsePtr&
                 )>&& callback
           ) {
+
         // Create tables
-        createTables();
-        
+        if (drogon::app().isRunning()) {
+            createTables();
+        }
+
         // Return response
         Json::Value response;
         response["status"] = "up";
@@ -64,7 +67,7 @@ void registerRoutes()
 
     // Register user routes
     auto userController = make_shared<UserController>();
-    app().registerHandler(
+    drogon::app().registerHandler(
         "/api/v1/user", 
         [userController](
         const HttpRequestPtr& req, 
@@ -79,6 +82,7 @@ void registerRoutes()
         }, 
         {Options, Get, Post, "AuthFilter"}
     );
+    
     app().registerHandler(
     "/api/v1/user/{id}", 
     [userController](
@@ -139,14 +143,14 @@ void dropTables() {
 
 void runServer() {
     // Set log level
-    app().setLogLevel(trantor::Logger::kTrace);
+    drogon::app().setLogLevel(trantor::Logger::kTrace);
     int32_t port = 8000;
     // Set HTTP listener address and port
-    app().addListener("0.0.0.0", port);
+    drogon::app().addListener("0.0.0.0", port);
 
     // Load config file
     try {
-        app().loadConfigFile("../config.json");
+        drogon::app().loadConfigFile("../config.json");
     } catch (const exception& e) {
         cerr << "Exception caught: "
              << typeid(e).name() << " - " << e.what() << endl;
@@ -157,7 +161,7 @@ void runServer() {
 
     // Run server
     LOG_INFO << "Server running on 127.0.0.1:" << port;
-    app().run();
+    drogon::app().run();
 }
 
 map<string, string> loadEnvVariables(const string& filename) {
