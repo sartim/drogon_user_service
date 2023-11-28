@@ -10,7 +10,7 @@ User service running on Drogon Framework which handles RBAC management. Make sur
 * [Drogon](https://github.com/drogonframework/drogon)
 * [PostgreSQL](https://www.postgresql.org)
 * [JWT-CPP](https://github.com/Thalhammer/jwt-cpp)
-* [Bcrypt](https://github.com/rg3/bcrypt.git)
+* [Bcrypt](https://git@github.com:hilch/Bcrypt.cpp.git)
 * [OpenSSL](https://github.com/openssl/openssl.git)
 
 ## Create .env file
@@ -22,8 +22,9 @@ User service running on Drogon Framework which handles RBAC management. Make sur
 
 ## Setup bcrypt
 
-    $ cp bcrypt.a /usr/local/lib/
-    $ cp bcrypt.h /usr/local/include/
+On the project root:
+
+    $ git clone git@github.com:hilch/Bcrypt.cpp.git
 
 ## Install jwt-cpp
 
