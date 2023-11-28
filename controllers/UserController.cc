@@ -135,38 +135,47 @@ void UserController::createUser(
         Mapper<Users> mp(client);
 
         auto jsonBody = req->getJsonObject();
-        Users user;
-        user.setFirstName((*jsonBody)["first_name"].asString());
-        user.setLastName((*jsonBody)["last_name"].asString());
-        user.setEmail((*jsonBody)["email"].asString());
-        user.setIsDeleted(true);
-        string password = (*jsonBody)["password"].asString();
-        string hashedPassword = BCrypt::hashPassword(password);
-        user.setPassword(hashedPassword);
-        auto currDate = trantor::Date::now();
-        user.setCreatedAt(currDate);
 
-        try
-        {
-            auto result = mp.insertFuture(user);
-            auto r = result.get();
-            auto resp = handleResponse(r.toJson(), k201Created);
+        if (jsonBody) {
+            Users user;
+            user.setFirstName((*jsonBody)["first_name"].asString());
+            user.setLastName((*jsonBody)["last_name"].asString());
+            user.setEmail((*jsonBody)["email"].asString());
+            user.setIsDeleted(true);
+            string password = (*jsonBody)["password"].asString();
+            string hashedPassword = BCrypt::hashPassword(password);
+            user.setPassword(hashedPassword);
+            auto currDate = trantor::Date::now();
+            user.setCreatedAt(currDate);
+
+            try
+            {
+                auto result = mp.insertFuture(user);
+                auto r = result.get();
+                auto resp = handleResponse(r.toJson(), k201Created);
+                callback(resp);
+            }
+            catch (const exception& e)
+            {
+                cerr
+                    << "Exception caught: "
+                    << typeid(e).name() << " - " << e.what() << endl;
+            }
+
+            Json::Value response;
+            response["user"] = "result";
+            auto resp= HttpResponse::newHttpJsonResponse(response);
+            resp->setStatusCode(k200OK);
+            resp->setContentTypeCode(CT_APPLICATION_JSON);
+            resp->addHeader("Access-Control-Allow-Origin", "*");
             callback(resp);
+        } else {
+            Json::Value error;
+            error["error"] = "Missing request body";
+            shared_ptr<HttpResponse> response = handleResponse(
+                error, k400BadRequest);
+            callback(response);
         }
-        catch (const exception& e)
-        {
-            cerr 
-            << "Exception caught: " 
-            << typeid(e).name() << " - " << e.what() << endl;
-        }
-
-        Json::Value response;
-        response["user"] = "result";
-        auto resp= HttpResponse::newHttpJsonResponse(response);
-        resp->setStatusCode(k200OK);
-        resp->setContentTypeCode(CT_APPLICATION_JSON);
-        resp->addHeader("Access-Control-Allow-Origin", "*");
-        callback(resp);
     } else {
         Json::Value error;
         error["error"] = "Unable to connect to database";
