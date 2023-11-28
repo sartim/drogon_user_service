@@ -18,7 +18,8 @@ jobs:
         - 5432:5432
     steps:
     - uses: actions/checkout@v3
-    
+    - name: Run unit tests
+      run: echo "Run unit tests"
   build:
     runs-on: ubuntu-latest
     services:
@@ -55,7 +56,7 @@ jobs:
         cd jwt-cpp && mkdir build && cd build && sudo cmake .. && sudo make && sudo make install
     - name: Install Bcrypt CPP Library
       run: |
-        git clone https://git@github.com:hilch/Bcrypt.cpp.git
+        git clone https://github.com/hilch/Bcrypt.cpp.git
     - name: Run Scripts
       run: |
         sudo chmod +x ./scripts/create_dot_env.sh
