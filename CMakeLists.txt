@@ -1,10 +1,15 @@
 cmake_minimum_required(VERSION 3.5)
 project(drogon_user_service CXX)
 
+set(BCRYPT_CPP_INCLUDE_PATH "Bcrypt.cpp/include")
+
 set(CMAKE_C_ARCHIVE_CREATE "<CMAKE_AR> qc <TARGET> <LINK_FLAGS> <OBJECTS>")
 set(CMAKE_C_ARCHIVE_FINISH "<CMAKE_RANLIB> -no_warning_for_no_symbols -c <TARGET>")
 
 include(CheckIncludeFileCXX)
+
+# Include directories for Bcrypt.cpp headers
+include_directories(${BCRYPT_CPP_INCLUDE_PATH})
 
 check_include_file_cxx(any HAS_ANY)
 check_include_file_cxx(string_view HAS_STRING_VIEW)
@@ -89,3 +94,9 @@ target_include_directories(${PROJECT_NAME} PRIVATE jwt-cpp)
 #find_package(AWSSDK CONFIG COMPONENTS core dynamodb kinesis s3 REQUIRED)
 #target_include_directories(${PROJECT_NAME} PRIVATE ${AWSSDK_INCLUDE_DIRS})
 #target_link_libraries(${PROJECT_NAME} PRIVATE ${AWSSDK_LIBRARIES})
+
+# find_package(bcrypt REQUIRED)
+add_library(bcrypt Bcrypt.cpp/src/bcrypt.cpp Bcrypt.cpp/src/blowfish.cpp)
+target_include_directories(bcrypt PRIVATE Bcrypt.cpp/src/)
+target_include_directories(bcrypt PUBLIC Bcrypt.cpp/include/)
+target_link_libraries(${PROJECT_NAME} PRIVATE bcrypt)

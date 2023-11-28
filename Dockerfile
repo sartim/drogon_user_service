@@ -40,15 +40,13 @@ RUN git clone https://github.com/Thalhammer/jwt-cpp.git
 # Build and install the JWT-CPP library
 RUN cd jwt-cpp && mkdir build && cd build && cmake .. && make && make install
 
-# Clone JSON-CPP repository
-# RUN git clone https://github.com/open-source-parsers/jsoncpp
-
-# Build and install the JSON-CPP library
-# RUN cd jsoncpp/ && mkdir build && cd build && cmake .. && make && make install
 
 # Copy the application code
 # WORKDIR /app
 COPY . .
+
+# Install brcrypt
+RUN git clone https://git@github.com:hilch/Bcrypt.cpp.git
 
 # Run scripts
 RUN chmod +x scripts/create_dot_env.sh
