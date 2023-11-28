@@ -572,3 +572,6 @@ config.json
 
 # Env
 .env
+
+# Libraries
+Bcrypt.cpp
