@@ -3,6 +3,7 @@
 #include <map>
 #include <sstream>
 #include <stdexcept>
+#include "controllers/AuthController.h"
 #include "controllers/UserController.h"
 #include "controllers/RoleController.h"
 #include "tables/PermissionTable.h"
@@ -65,6 +66,21 @@ void registerRoutes()
         callback(resp);
     });
 
+    // Register generate jwt token
+    auto authController = make_shared<AuthController>();
+    drogon::app().registerHandler(
+        "/api/v1/generate-jwt",
+        [authController](
+            const HttpRequestPtr& req,
+            function<void(const HttpResponsePtr&)>&& callback) {
+          if (req->method() == Options) {
+            // authController->getHeaders(req, std::move(callback));
+          } else if (req->method() == Post) {
+            authController->asyncHandleHttpRequest(req, std::move(callback));
+          }
+        },
+        {Options, Post});
+
     // Register user routes
     auto userController = make_shared<UserController>();
     drogon::app().registerHandler(
@@ -73,11 +89,11 @@ void registerRoutes()
         const HttpRequestPtr& req, 
         function<void(const HttpResponsePtr&)>&& callback) {
             if (req->method() == Options) {
-                userController->getHeaders(req, move(callback));
+                userController->getHeaders(req, std::move(callback));
             } else if (req->method() == Get) {
-                userController->getUsers(req, move(callback));
+                userController->getUsers(req, std::move(callback));
             } else if (req->method() == Post) {
-                userController->createUser(req, move(callback));
+                userController->createUser(req, std::move(callback));
             }
         }, 
         {Options, Get, Post, "AuthFilter"}
@@ -89,13 +105,13 @@ void registerRoutes()
         const HttpRequestPtr& req, 
         function<void(const HttpResponsePtr&)>&& callback, const string& id) {
             if (req->method() == Options) {
-                userController->getByIdHeaders(req, move(callback), id);
+                userController->getByIdHeaders(req, std::move(callback), id);
             } else if (req->method() == Get) {
-                userController->getUserById(req, move(callback), id);
+                userController->getUserById(req, std::move(callback), id);
             } else if (req->method() == Put) {
-                userController->updateUserById(req, move(callback), id);;
+                userController->updateUserById(req, std::move(callback), id);;
             } else if (req->method() == Delete) {
-                userController->deleteUserById(req, move(callback), id);;
+                userController->deleteUserById(req, std::move(callback), id);;
             }
     }, 
     {Options, Get, Put, Delete, "AuthFilter"}
@@ -109,11 +125,11 @@ void registerRoutes()
             const HttpRequestPtr& req,
             function<void(const HttpResponsePtr&)>&& callback) {
           if (req->method() == Options) {
-            roleController->getHeaders(req, move(callback));
+            roleController->getHeaders(req, std::move(callback));
           } else if (req->method() == Get) {
-            roleController->getRoles(req, move(callback));
+            roleController->getRoles(req, std::move(callback));
           } else if (req->method() == Post) {
-            roleController->createRole(req, move(callback));
+            roleController->createRole(req, std::move(callback));
           }
         },
         {Options, Get, Post, "AuthFilter"}
@@ -124,13 +140,13 @@ void registerRoutes()
             const HttpRequestPtr& req,
             function<void(const HttpResponsePtr&)>&& callback, const string& id) {
           if (req->method() == Options) {
-            roleController->getByIdHeaders(req, move(callback), id);
+            roleController->getByIdHeaders(req, std::move(callback), id);
           } else if (req->method() == Get) {
-            roleController->getRoleById(req, move(callback), id);
+            roleController->getRoleById(req, std::move(callback), id);
           } else if (req->method() == Put) {
-            roleController->updateRoleById(req, move(callback), id);;
+            roleController->updateRoleById(req, std::move(callback), id);;
           } else if (req->method() == Delete) {
-            roleController->deleteRoleById(req, move(callback), id);;
+            roleController->deleteRoleById(req, std::move(callback), id);;
           }
         },
         {Options, Get, Put, Delete, "AuthFilter"}
