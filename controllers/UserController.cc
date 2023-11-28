@@ -4,7 +4,7 @@
 #include <drogon/orm/Mapper.h>
 #include "UserController.h"
 #include "models/Users.h"
-#include "helpers/BCrypt.h"
+#include "bcrypt.h"
 
 using namespace std;
 using namespace drogon;
@@ -143,16 +143,18 @@ void UserController::createUser(
             user.setEmail((*jsonBody)["email"].asString());
             user.setIsDeleted(true);
             string password = (*jsonBody)["password"].asString();
-            string hashedPassword = BCrypt::hashPassword(password);
+            string hashedPassword = bcrypt::generateHash(password);
             user.setPassword(hashedPassword);
             auto currDate = trantor::Date::now();
             user.setCreatedAt(currDate);
+            user.setUpdatedAt(currDate);
 
             try
             {
                 auto result = mp.insertFuture(user);
                 auto r = result.get();
-                auto resp = handleResponse(r.toJson(), k201Created);
+                shared_ptr<HttpResponse> resp = handleResponse(
+                    r.toJson(), k201Created);
                 callback(resp);
             }
             catch (const exception& e)
@@ -160,15 +162,15 @@ void UserController::createUser(
                 cerr
                     << "Exception caught: "
                     << typeid(e).name() << " - " << e.what() << endl;
+
+                Json::Value response;
+                response["error"] = e.what();
+                shared_ptr<HttpResponse> resp = handleResponse(
+                    response, k400BadRequest);
+                callback(resp);
             }
 
-            Json::Value response;
-            response["user"] = "result";
-            auto resp= HttpResponse::newHttpJsonResponse(response);
-            resp->setStatusCode(k200OK);
-            resp->setContentTypeCode(CT_APPLICATION_JSON);
-            resp->addHeader("Access-Control-Allow-Origin", "*");
-            callback(resp);
+
         } else {
             Json::Value error;
             error["error"] = "Missing request body";
@@ -214,9 +216,8 @@ void UserController::updateUserById(
         user.setEmail(email);
         user.setEmail(email);
 
-        string salt_key_b64 = BCrypt::hashPassword(password);
-        cout << "Hashed password: " << salt_key_b64 << endl;
-        user.setPassword(salt_key_b64);
+        string hashedPassword = bcrypt::generateHash(password);
+        user.setPassword(hashedPassword);
 
         auto currDate = trantor::Date::now();
         user.setCreatedAt(currDate);
