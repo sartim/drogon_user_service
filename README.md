@@ -24,7 +24,7 @@ User service running on Drogon Framework which handles RBAC management. Make sur
 
 On the project root:
 
-    $ git clone git@github.com:hilch/Bcrypt.cpp.git
+    $ git clone https://github.com/hilch/Bcrypt.cpp.git
 
 ## Install jwt-cpp
 
