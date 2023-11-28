@@ -1,9 +1,10 @@
 #include <drogon/HttpSimpleController.h>
+#include "BaseController.h"
 
 using namespace std;
 using namespace drogon;
 
-class AuthController:public drogon::HttpSimpleController<AuthController>
+class AuthController:public drogon::HttpSimpleController<AuthController>, public BaseController
 {
 public:
     virtual void asyncHandleHttpRequest(
