@@ -1,7 +1,6 @@
 #include "controllers/AuthController.h"
 #include "controllers/RoleController.h"
 #include "controllers/UserController.h"
-#include "helpers/BCrypt.h"
 #include "models/Users.h"
 #include "tables/PermissionTable.h"
 #include "tables/RolePermissionTable.h"

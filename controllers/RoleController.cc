@@ -1,5 +1,4 @@
 #include "RoleController.h"
-#include "helpers/BCrypt.h"
 #include "models/Roles.h"
 #include <drogon/HttpResponse.h>
 #include <drogon/HttpSimpleController.h>
