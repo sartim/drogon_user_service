@@ -1,5 +1,5 @@
 {
-  "name" : "drogoncore-user-service",
+  "name" : "drogon-user-service",
   "version-string" : "1.0.0",
   "builtin-baseline" : "b3e0a1e625a0cc00073efb763e39088e5b75939e",
   "dependencies" : [ {
