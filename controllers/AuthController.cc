@@ -1,5 +1,6 @@
 #include "AuthController.h"
 #include "../helpers/AuthToken.h"
+#include "../helpers/Env.h"
 #include "../models/Users.h"
 #include "bcrypt.h"
 #include <drogon/HttpController.h>
@@ -50,8 +51,7 @@ void AuthController::asyncHandleHttpRequest(
         usersJson.append(userJson);
 
         // Generate token for user found here and return as json
-        auto config = drogon::app().getCustomConfig()["secret_key"];
-        const string secretKey = config.asString();
+        const string secretKey = getEnv("SECRET_KEY");
         string access = generateJWT(secretKey, email);
         string refresh = generateJWT(secretKey, email);
 
