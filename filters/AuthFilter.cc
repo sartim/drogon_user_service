@@ -4,7 +4,7 @@
 
 using namespace drogon;
 
-bool verifyJWT(const std::string& secretKey, const std::string& token)
+bool verifyJWT(const std::string &secretKey, const std::string &token)
 {
     if(token != "") {
       auto decoded_token = jwt::decode(token);
