@@ -61,6 +61,16 @@ void AuthController::asyncHandleHttpRequest(
        userJson["email"] = user.getValueOfEmail();
        usersJson.append(userJson);
 
+      // Generate token for user found here and return as json
+      auto config = drogon::app().getCustomConfig()["secret_key"];
+      const string secretKey = config.asString();
+      string jwt = generateJWT(secretKey, email);
+
+      Json::Value response;
+      response["token"] = jwt;
+      response["user"] = usersJson;
+      shared_ptr<HttpResponse> resp = handleResponse(response, k401Unauthorized);
+      callback(resp);
       }
     } else {
       Json::Value error;
@@ -68,17 +78,6 @@ void AuthController::asyncHandleHttpRequest(
       shared_ptr<HttpResponse> resp = handleResponse(error, k401Unauthorized);
       callback(resp);
     }
-
-    // Generate token for user found here and return as json
-    auto config = drogon::app().getCustomConfig()["secret_key"];
-    const string secretKey = config.asString();
-    string jwt = generateJWT(secretKey, email);
-
-    Json::Value response;
-    response["token"] = jwt;
-    response["user"] = usersJson;
-    shared_ptr<HttpResponse> resp = handleResponse(response, k401Unauthorized);
-    callback(resp);
   } else {
     Json::Value error;
     error["error"] = "Unable to connect to the database";
