@@ -1,27 +1,15 @@
 #include "AuthController.h"
+#include "../helpers/AuthToken.h"
 #include "../models/Users.h"
 #include "bcrypt.h"
 #include <drogon/HttpController.h>
 #include <drogon/HttpResponse.h>
 #include <drogon/orm/Mapper.h>
-#include <jwt-cpp/jwt.h>
 
 using namespace std;
 using namespace drogon;
 using namespace drogon::orm;
 using namespace drogon_model::drogon_user_service;
-
-string generateJWT(const string &secretKey, const string &email) {
-  auto token =
-      jwt::create()
-          .set_issuer("auth0")
-          .set_type("JWS")
-          .set_payload_claim("identity", jwt::claim(email))
-          .set_issued_at(chrono::system_clock::now())
-          .set_expires_at(chrono::system_clock::now() + chrono::seconds{3600})
-          .sign(jwt::algorithm::hs256{secretKey});
-  return token;
-}
 
 void AuthController::asyncHandleHttpRequest(
     const HttpRequestPtr &req,
@@ -64,13 +52,13 @@ void AuthController::asyncHandleHttpRequest(
         // Generate token for user found here and return as json
         auto config = drogon::app().getCustomConfig()["secret_key"];
         const string secretKey = config.asString();
-        string jwt = generateJWT(secretKey, email);
+        string access = generateJWT(secretKey, email);
+        string refresh = generateJWT(secretKey, email);
 
         Json::Value response;
-        response["token"] = jwt;
+        response["access"] = access;
         response["user"] = usersJson;
-        shared_ptr<HttpResponse> resp =
-            handleResponse(response, k401Unauthorized);
+        shared_ptr<HttpResponse> resp = handleResponse(response, k200OK);
         callback(resp);
       }
     } else {
