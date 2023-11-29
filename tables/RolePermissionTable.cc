@@ -10,7 +10,8 @@ const string ROLE_PERMISSION_TABLE_NAME = "role_permissions";
 
 void RolePermissionTable::create() {
   try {
-    auto sql = "CREATE TABLE IF NOT EXISTS public."+ ROLE_PERMISSION_TABLE_NAME +
+    auto sql = "CREATE TABLE IF NOT EXISTS public." +
+               ROLE_PERMISSION_TABLE_NAME +
                " ("
                "user_id UUID REFERENCES users(id),"
                "role_id UUID REFERENCES roles(id),"
@@ -24,13 +25,11 @@ void RolePermissionTable::create() {
     } else {
       LOG_WARN << "Connection failed";
     }
-  } catch (const std::exception& e) {
-    LOG_ERROR
-        << "Failed to create table "
-        << ROLE_PERMISSION_TABLE_NAME << ": " << e.what();
+  } catch (const std::exception &e) {
+    LOG_ERROR << "Failed to create table " << ROLE_PERMISSION_TABLE_NAME << ": "
+              << e.what();
   }
 }
-
 
 void RolePermissionTable::alter() {
   // TODO: Add ALTER TABLE query to modify table structure
@@ -41,9 +40,8 @@ void RolePermissionTable::_delete() {
     auto sql = "DROP TABLE IF EXISTS $1";
     client->execSqlSync(sql, ROLE_PERMISSION_TABLE_NAME);
     LOG_DEBUG << "Dropped table " << ROLE_PERMISSION_TABLE_NAME;
-  } catch (const std::exception& e) {
-    LOG_ERROR
-        << "Failed to drop table "
-        << ROLE_PERMISSION_TABLE_NAME << ": " << e.what();
+  } catch (const std::exception &e) {
+    LOG_ERROR << "Failed to drop table " << ROLE_PERMISSION_TABLE_NAME << ": "
+              << e.what();
   }
 }

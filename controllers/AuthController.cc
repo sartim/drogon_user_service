@@ -1,10 +1,10 @@
 #include "AuthController.h"
 #include "../models/Users.h"
+#include "bcrypt.h"
 #include <drogon/HttpController.h>
 #include <drogon/HttpResponse.h>
 #include <drogon/orm/Mapper.h>
 #include <jwt-cpp/jwt.h>
-#include "bcrypt.h"
 
 using namespace std;
 using namespace drogon;
@@ -54,23 +54,24 @@ void AuthController::asyncHandleHttpRequest(
               handleResponse(error, k401Unauthorized);
           callback(resp);
         }
-       Json::Value userJson;
-       userJson["id"] = user.getValueOfId();
-       userJson["first_name"] = user.getValueOfFirstName();
-       userJson["last_name"] = user.getValueOfLastName();
-       userJson["email"] = user.getValueOfEmail();
-       usersJson.append(userJson);
+        Json::Value userJson;
+        userJson["id"] = user.getValueOfId();
+        userJson["first_name"] = user.getValueOfFirstName();
+        userJson["last_name"] = user.getValueOfLastName();
+        userJson["email"] = user.getValueOfEmail();
+        usersJson.append(userJson);
 
-      // Generate token for user found here and return as json
-      auto config = drogon::app().getCustomConfig()["secret_key"];
-      const string secretKey = config.asString();
-      string jwt = generateJWT(secretKey, email);
+        // Generate token for user found here and return as json
+        auto config = drogon::app().getCustomConfig()["secret_key"];
+        const string secretKey = config.asString();
+        string jwt = generateJWT(secretKey, email);
 
-      Json::Value response;
-      response["token"] = jwt;
-      response["user"] = usersJson;
-      shared_ptr<HttpResponse> resp = handleResponse(response, k401Unauthorized);
-      callback(resp);
+        Json::Value response;
+        response["token"] = jwt;
+        response["user"] = usersJson;
+        shared_ptr<HttpResponse> resp =
+            handleResponse(response, k401Unauthorized);
+        callback(resp);
       }
     } else {
       Json::Value error;
