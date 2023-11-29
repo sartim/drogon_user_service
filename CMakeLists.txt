@@ -2,13 +2,10 @@ cmake_minimum_required(VERSION 3.5)
 project(drogon_user_service CXX)
 
 set(BCRYPT_CPP_INCLUDE_PATH "Bcrypt.cpp/include")
-
 set(CMAKE_C_ARCHIVE_CREATE "<CMAKE_AR> qc <TARGET> <LINK_FLAGS> <OBJECTS>")
 set(CMAKE_C_ARCHIVE_FINISH "<CMAKE_RANLIB> -no_warning_for_no_symbols -c <TARGET>")
 
 include(CheckIncludeFileCXX)
-
-# Include directories for Bcrypt.cpp headers
 include_directories(${BCRYPT_CPP_INCLUDE_PATH})
 
 check_include_file_cxx(any HAS_ANY)
@@ -55,6 +52,7 @@ aux_source_directory(plugins PLUGIN_SRC)
 aux_source_directory(models MODEL_SRC)
 aux_source_directory(tables TABLE_SRC)
 aux_source_directory(helpers HELPER_SRC)
+aux_source_directory(schemas SCHEMA_SRC)
 drogon_create_views(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/views
                     ${CMAKE_CURRENT_BINARY_DIR})
 # use the following line to create views with namespaces.
@@ -76,7 +74,8 @@ target_sources(${PROJECT_NAME}
                ${PLUGIN_SRC}
                ${MODEL_SRC}
                ${TABLE_SRC}
-               ${HELPER_SRC})
+               ${HELPER_SRC}
+               ${SCHEMA_SRC})
 # ##############################################################################
 # uncomment the following line for dynamically loading views 
 # set_property(TARGET ${PROJECT_NAME} PROPERTY ENABLE_EXPORTS ON)
@@ -95,7 +94,6 @@ target_include_directories(${PROJECT_NAME} PRIVATE jwt-cpp)
 #target_include_directories(${PROJECT_NAME} PRIVATE ${AWSSDK_INCLUDE_DIRS})
 #target_link_libraries(${PROJECT_NAME} PRIVATE ${AWSSDK_LIBRARIES})
 
-# find_package(bcrypt REQUIRED)
 add_library(bcrypt Bcrypt.cpp/src/bcrypt.cpp Bcrypt.cpp/src/blowfish.cpp)
 target_include_directories(bcrypt PRIVATE Bcrypt.cpp/src/)
 target_include_directories(bcrypt PUBLIC Bcrypt.cpp/include/)

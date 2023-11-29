@@ -1,8 +1,8 @@
-name: build
+name: stage-build
 
 on:
   push:
-    branches: [ main ]
+    branches: [ develop ]
 
 jobs:
   test:
@@ -19,7 +19,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Run unit tests
-      run: echo "Run unit tests"
+      run: echo "Run unit tests"  
   build:
     runs-on: ubuntu-latest
     services:
@@ -73,10 +73,10 @@ jobs:
       run: |
         sudo mkdir drogon_user_service
         sudo cp .env drogon_user_service
-        cd drogon_user_service && sudo zip -r drogon_user_service_prod.zip .
+        cd drogon_user_service && sudo zip -r drogon_user_service_stage.zip .
     - name: Upload compressed binary to S3
       # run: |
-      #   aws s3 cp drogon_user_service/drogon_user_service_prod.zip ${{ secrets.SMS_GATEWAY_S3_URI }}/drogon_user_service_prod.zip --region ${{ secrets.AWS_REGION }}
+      #   aws s3 cp drogon_user_service/drogon_user_service_stage.zip ${{ secrets.SMS_GATEWAY_S3_URI }}/drogon_user_service_stage.zip --region ${{ secrets.AWS_REGION }}
       run: echo "Upload to aws s3 here"
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -93,8 +93,8 @@ jobs:
         sudo apt-get update &&
         sudo apt-get install -y redis-server &&
         sudo apt-get install -y awscli
-    - name: Deploy to prod
-      # run: aws deploy create-deployment --region ${{ secrets.AWS_REGION }} --application-name sms-gateway --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name sms-gateway-server-2-dg --description "Github deployment for commit ${GITHUB_SHA}" --s3-location bucket=eneza-sms-gateway,key=sms-gateway-bundle-prod.zip,bundleType=zip
+    - name: Deploy to stage
+      # run: aws deploy create-deployment --region ${{ secrets.AWS_REGION }} --application-name sms-gateway --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name sms-gateway-server-2-dg --description "Github deployment for commit ${GITHUB_SHA}" --s3-location bucket=eneza-sms-gateway,key=sms-gateway-bundle-stage.zip,bundleType=zip
       run: echo "Create codedeploy deployment"
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}

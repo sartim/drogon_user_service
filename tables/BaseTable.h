@@ -5,14 +5,12 @@
 using namespace drogon;
 using namespace drogon::orm;
 
-class BaseTable
-{
-    public:
-        drogon::orm::DbClientPtr client;
-        void connect(){
-            if (client == nullptr) {
-                client = drogon::app().getDbClient();
-            }
-        }
+class BaseTable {
+public:
+  drogon::orm::DbClientPtr client;
+  void connect() {
+    if (client == nullptr) {
+      client = drogon::app().getDbClient();
+    }
+  }
 };
-

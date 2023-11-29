@@ -46,7 +46,7 @@ RUN cd jwt-cpp && mkdir build && cd build && cmake .. && make && make install
 COPY . .
 
 # Install brcrypt
-RUN git clone https://git@github.com:hilch/Bcrypt.cpp.git
+RUN git clone https://github.com/hilch/Bcrypt.cpp.git
 
 # Run scripts
 RUN chmod +x scripts/create_dot_env.sh
