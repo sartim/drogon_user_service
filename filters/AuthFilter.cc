@@ -15,10 +15,11 @@ void AuthFilter::doFilter(const HttpRequestPtr &req, FilterCallback &&fcb,
   bool isVerified = verifyJWT(secretKey, token);
   if (!isVerified) {
     Json::Value error;
-    error["error"] = "Missing Authorization Header";
+    error["error"] = "Invalid Access token";
     auto response = drogon::HttpResponse::newHttpJsonResponse(error);
     response->setStatusCode(k401Unauthorized);
     fcb(response);
+  } else {
+    fccb();
   }
-  fccb();
 }
