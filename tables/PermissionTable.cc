@@ -1,6 +1,7 @@
 #include "PermissionTable.h"
 #include <drogon/drogon.h>
 #include <iostream>
+#include <pqxx/pqxx>
 
 using namespace std;
 using namespace drogon;
