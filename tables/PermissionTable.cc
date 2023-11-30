@@ -8,7 +8,7 @@ using namespace drogon::orm;
 
 const string PERMISSION_TABLE_NAME = "permissions";
 
-void PermissionTable::create() {
+void PermissionTable::create(const string &connectionString) {
   try {
     auto sql = "CREATE TABLE IF NOT EXISTS public." + PERMISSION_TABLE_NAME +
                " ("
@@ -21,29 +21,31 @@ void PermissionTable::create() {
                "updated_at timestamp with time zone,"
                "deleted_at timestamp with time zone"
                ")";
-    if (client) {
-      client->execSqlSync(sql);
-      LOG_DEBUG << "Created table " << PERMISSION_TABLE_NAME;
-    } else {
-      LOG_WARN << "Connection failed";
-    }
+    pqxx::connection client{connectionString};
+    pqxx::work txn{client};
+    txn.exec(sql);
+    txn.commit();
+    LOG_DEBUG << "Created table " << PERMISSION_TABLE_NAME;
   } catch (const std::exception &e) {
     LOG_ERROR << "Failed to create table " << PERMISSION_TABLE_NAME << ": "
               << e.what();
   }
 }
 
-void PermissionTable::alter() {
+void PermissionTable::alter(const string &connectionString) {
   // TODO: Add ALTER TABLE query to modify table structure
 }
 
-void PermissionTable::_delete() {
-  try {
-    auto sql = "DROP TABLE IF EXISTS $1";
-    client->execSqlSync(sql, PERMISSION_TABLE_NAME);
-    LOG_DEBUG << "Dropped table " << PERMISSION_TABLE_NAME;
-  } catch (const std::exception &e) {
-    LOG_ERROR << "Failed to drop table " << PERMISSION_TABLE_NAME << ": "
-              << e.what();
-  }
+void PermissionTable::_delete(const string &connectionString) {
+    try {
+      auto sql = "DROP TABLE IF EXISTS $1";
+      pqxx::connection client{connectionString};
+      pqxx::work txn{client};
+      txn.exec(sql);
+      txn.commit();
+      LOG_DEBUG << "Dropped table " << PERMISSION_TABLE_NAME;
+    } catch (const std::exception &e) {
+      LOG_ERROR << "Failed to drop table " << PERMISSION_TABLE_NAME << ": "
+                << e.what();
+    }
 }

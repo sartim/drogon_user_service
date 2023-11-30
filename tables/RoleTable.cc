@@ -8,7 +8,7 @@ using namespace drogon::orm;
 
 const string ROLE_TABLE_NAME = "roles";
 
-void RoleTable::create() {
+void RoleTable::create(const string &connectionString) {
   try {
     auto sql = "CREATE TABLE IF NOT EXISTS public." + ROLE_TABLE_NAME +
                " ("
@@ -21,28 +21,30 @@ void RoleTable::create() {
                "updated_at timestamp with time zone,"
                "deleted_at timestamp with time zone"
                ")";
-    if (client) {
-      client->execSqlSync(sql);
-      LOG_DEBUG << "Created table " << ROLE_TABLE_NAME;
-    } else {
-      LOG_WARN << "Connection failed";
-    }
+    pqxx::connection client{connectionString};
+    pqxx::work txn{client};
+    txn.exec(sql);
+    txn.commit();
+    LOG_DEBUG << "Created table " << ROLE_TABLE_NAME;
   } catch (const std::exception &e) {
     LOG_ERROR << "Failed to create table " << ROLE_TABLE_NAME << ": "
               << e.what();
   }
 }
 
-void RoleTable::alter() {
+void RoleTable::alter(const string &connectionString) {
   // TODO: Add ALTER TABLE query to modify table structure
 }
 
-void RoleTable::_delete() {
-  try {
-    auto sql = "DROP TABLE IF EXISTS $1";
-    client->execSqlSync(sql, ROLE_TABLE_NAME);
-    LOG_DEBUG << "Dropped table " << ROLE_TABLE_NAME;
-  } catch (const std::exception &e) {
-    LOG_ERROR << "Failed to drop table " << ROLE_TABLE_NAME << ": " << e.what();
-  }
+void RoleTable::_delete(const string &connectionString) {
+    try {
+      auto sql = "DROP TABLE IF EXISTS $1";
+      pqxx::connection client{connectionString};
+      pqxx::work txn{client};
+      txn.exec(sql);
+      txn.commit();
+      LOG_DEBUG << "Dropped table " << ROLE_TABLE_NAME;
+    } catch (const std::exception &e) {
+      LOG_ERROR << "Failed to drop table " << ROLE_TABLE_NAME << ": " << e.what();
+    }
 }
