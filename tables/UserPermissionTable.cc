@@ -8,7 +8,7 @@ using namespace drogon::orm;
 
 const string USER_PERMISSION_TABLE_NAME = "user_permissions";
 
-void UserPermissionTable::create() {
+void UserPermissionTable::create(const string &connectionString) {
   try {
     auto sql = "CREATE TABLE IF NOT EXISTS public." +
                USER_PERMISSION_TABLE_NAME +
@@ -19,26 +19,28 @@ void UserPermissionTable::create() {
                "updated_at timestamp with time zone,"
                "PRIMARY KEY (user_id, permission_id)"
                ")";
-    if (client) {
-      client->execSqlSync(sql);
-      LOG_DEBUG << "Created table " << USER_PERMISSION_TABLE_NAME;
-    } else {
-      LOG_WARN << "Connection failed";
-    }
+    pqxx::connection client{connectionString};
+    pqxx::work txn{client};
+    txn.exec(sql);
+    txn.commit();
+    LOG_DEBUG << "Created table " << USER_PERMISSION_TABLE_NAME;
   } catch (const std::exception &e) {
     LOG_ERROR << "Failed to create table " << USER_PERMISSION_TABLE_NAME << ": "
               << e.what();
   }
 }
 
-void UserPermissionTable::alter() {
+void UserPermissionTable::alter(const string &connectionString) {
   // TODO: Add ALTER TABLE query to modify table structure
 }
 
-void UserPermissionTable::_delete() {
+void UserPermissionTable::_delete(const string &connectionString) {
   try {
     auto sql = "DROP TABLE IF EXISTS $1";
-    client->execSqlSync(sql, USER_PERMISSION_TABLE_NAME);
+    pqxx::connection client{connectionString};
+    pqxx::work txn{client};
+    txn.exec(sql);
+    txn.commit();
     LOG_DEBUG << "Dropped table " << USER_PERMISSION_TABLE_NAME;
   } catch (const std::exception &e) {
     LOG_ERROR << "Failed to drop table " << USER_PERMISSION_TABLE_NAME << ": "

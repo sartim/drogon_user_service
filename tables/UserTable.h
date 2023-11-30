@@ -1,17 +1,15 @@
 #pragma once
 
 #include "BaseTable.h"
-#include <drogon/drogon.h>
 
-using namespace drogon;
-using namespace drogon::orm;
+using namespace std;
 
 class UserTable : public BaseTable {
 public:
-  UserTable() { connect(); };
+  UserTable() { };
 
 public:
-  void create();
-  void alter();
-  void _delete();
+  void create(const string &connectionString);
+  void alter(const string &connectionString);
+  void _delete(const string &connectionString);
 };

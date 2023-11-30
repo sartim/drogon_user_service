@@ -1,14 +1,12 @@
 #include "UserTable.h"
-#include <drogon/drogon.h>
 #include <iostream>
+#include <pqxx/pqxx>
 
 using namespace std;
-using namespace drogon;
-using namespace drogon::orm;
 
 const string USER_TABLE_NAME = "users";
 
-void UserTable::create() {
+void UserTable::create(const string &connectionString) {
   try {
     auto sql = "CREATE TABLE IF NOT EXISTS public." + USER_TABLE_NAME +
                " ("
@@ -22,28 +20,30 @@ void UserTable::create() {
                "updated_at timestamp with time zone,"
                "deleted_at timestamp with time zone"
                ")";
-    if (client) {
-      client->execSqlSync(sql);
-      LOG_DEBUG << "Created table " << USER_TABLE_NAME;
-    } else {
-      LOG_WARN << "Connection failed";
-    }
-  } catch (const std::exception &e) {
+    pqxx::connection client{connectionString};
+    pqxx::work txn{client};
+    txn.exec(sql);
+    txn.commit();
+    LOG_DEBUG << "Created table " << USER_TABLE_NAME;
+  } catch (const exception &e) {
     LOG_ERROR << "Failed to create table " << USER_TABLE_NAME << ": "
               << e.what();
   }
 }
 
-void UserTable::alter() {
+void UserTable::alter(const string &connectionString) {
   // TODO: Add ALTER TABLE query to modify table structure
 }
 
-void UserTable::_delete() {
+void UserTable::_delete(const string &connectionString) {
   try {
     auto sql = "DROP TABLE IF EXISTS $1";
-    client->execSqlSync(sql, USER_TABLE_NAME);
+    pqxx::connection client{connectionString};
+    pqxx::work txn{client};
+    txn.exec(sql);
+    txn.commit();
     LOG_DEBUG << "Dropped table " << USER_TABLE_NAME;
-  } catch (const std::exception &e) {
+  } catch (const exception &e) {
     LOG_ERROR << "Failed to drop table " << USER_TABLE_NAME << ": " << e.what();
   }
 }

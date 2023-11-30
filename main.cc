@@ -19,26 +19,27 @@ using namespace drogon;
 using namespace drogon::orm;
 using namespace drogon_model::drogon_user_service;
 
-void createTables() {
+
+void createTables(const string &connectionString) {
   // User table
   UserTable userTable;
-  userTable.create();
+  userTable.create(connectionString);
 
   // Role  table
   RoleTable roleTable;
-  roleTable.create();
+  roleTable.create(connectionString);
 
   // Permission  table
   PermissionTable permissionTable;
-  permissionTable.create();
+  permissionTable.create(connectionString);
 
   // User permission  table
   UserPermissionTable userPermissionTable;
-  userPermissionTable.create();
+  userPermissionTable.create(connectionString);
 
   // Role permission  table
   RolePermissionTable rolePermissionTable;
-  rolePermissionTable.create();
+  rolePermissionTable.create(connectionString);
 }
 
 void registerRoutes() {
@@ -46,11 +47,6 @@ void registerRoutes() {
   drogon::app().registerHandler(
       "/", [](const HttpRequestPtr &req,
               function<void(const HttpResponsePtr &)> &&callback) {
-        // Create tables
-        if (drogon::app().isRunning()) {
-          createTables();
-        }
-
         // Return response
         Json::Value response;
         response["status"] = "up";
@@ -65,7 +61,7 @@ void registerRoutes() {
       [authController](const HttpRequestPtr &req,
                        function<void(const HttpResponsePtr &)> &&callback) {
         if (req->method() == Options) {
-          // authController->getHeaders(req, std::move(callback));
+          authController->getHeaders(req, std::move(callback));
         } else if (req->method() == Post) {
           authController->asyncHandleHttpRequest(req, std::move(callback));
         }
@@ -261,12 +257,23 @@ int main(int argc, char *argv[]) {
   string key = action.substr(0, equalsPos);
   string value = action.substr(equalsPos + 1);
 
+  // Database config to database cli interface
+  map<string, string> envVariables = loadEnvVariables(".env");
+  Json::Value config;
+  string secretKey = envVariables["SECRET_KEY"];
+  string dbHost = envVariables["DB_HOST"];
+  string dbName = envVariables["DB_NAME"];
+  string user = envVariables["DB_USER"];
+  string password = envVariables["DB_PASSWORD"];
+  string port = "5432";
+  string connectionString = "postgresql://"+ user +":"+ password +"@"+ dbHost +":"+ port +"/"+ dbName;
+
   // Check the action and perform the corresponding operation
   if (key == "--action") {
     if (value == "run-server") {
       runServer();
     } else if (value == "create-tables") {
-      createTables();
+      createTables(connectionString);
     } else if (value == "drop-tables") {
       dropTables();
     } else {
