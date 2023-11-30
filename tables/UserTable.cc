@@ -4,7 +4,7 @@
 
 using namespace std;
 
-const string USER_TABLE_NAME = "users_test_4";
+const string USER_TABLE_NAME = "users";
 
 void UserTable::create(const string &connectionString) {
   try {
