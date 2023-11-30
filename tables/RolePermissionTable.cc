@@ -3,6 +3,7 @@
 #include <iostream>
 #include <pqxx/pqxx>
 
+using namespace pqxx;
 using namespace std;
 using namespace drogon;
 using namespace drogon::orm;
@@ -20,8 +21,8 @@ void RolePermissionTable::create(const string &connectionString) {
                "updated_at timestamp with time zone,"
                "PRIMARY KEY (user_id, role_id)"
                ")";
-    pqxx::connection client{connectionString};
-    pqxx::work txn{client};
+    connection client{connectionString};
+    work txn{client};
     txn.exec(sql);
     txn.commit();
     LOG_DEBUG << "Created table " << ROLE_PERMISSION_TABLE_NAME;
@@ -38,8 +39,8 @@ void RolePermissionTable::alter(const string &connectionString) {
 void RolePermissionTable::_delete(const string &connectionString) {
   try {
     auto sql = "DROP TABLE IF EXISTS $1";
-    pqxx::connection client{connectionString};
-    pqxx::work txn{client};
+    connection client{connectionString};
+    work txn{client};
     txn.exec(sql);
     txn.commit();
     LOG_DEBUG << "Dropped table " << ROLE_PERMISSION_TABLE_NAME;
