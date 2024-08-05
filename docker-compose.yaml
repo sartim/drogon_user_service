@@ -4,12 +4,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: user_service:latest
+    container_name: user_service
     environment:
       - SECRET_KEY=${SECRET_KEY}
       - DB_HOST=${DB_HOST}
       - DB_NAME=${DB_NAME}
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
-    image: ragnarok:latest
+    image: user_service:latest
     command: /build/drogon_user_service --action=run-server  
