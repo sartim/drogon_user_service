@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 ARG SECRET_KEY
 ARG DB_HOST
@@ -42,7 +42,6 @@ RUN cd jwt-cpp && mkdir build && cd build && cmake .. && make && make install
 
 
 # Copy the application code
-# WORKDIR /app
 COPY . .
 
 # Install brcrypt
