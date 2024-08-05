@@ -1,0 +1,15 @@
+version: '3'
+services:
+  web-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: user-service:latest
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - DB_HOST=${DB_HOST}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+    image: ragnarok:latest
+    command: /build/drogon_user_service --action=run-server  

@@ -1,7 +1,9 @@
 #include "UserPermissionTable.h"
 #include <drogon/drogon.h>
 #include <iostream>
+#include <pqxx/pqxx>
 
+using namespace pqxx;
 using namespace std;
 using namespace drogon;
 using namespace drogon::orm;
@@ -19,8 +21,8 @@ void UserPermissionTable::create(const string &connectionString) {
                "updated_at timestamp with time zone,"
                "PRIMARY KEY (user_id, permission_id)"
                ")";
-    pqxx::connection client{connectionString};
-    pqxx::work txn{client};
+    connection client{connectionString};
+    work txn{client};
     txn.exec(sql);
     txn.commit();
     LOG_DEBUG << "Created table " << USER_PERMISSION_TABLE_NAME;
@@ -37,8 +39,8 @@ void UserPermissionTable::alter(const string &connectionString) {
 void UserPermissionTable::_delete(const string &connectionString) {
   try {
     auto sql = "DROP TABLE IF EXISTS $1";
-    pqxx::connection client{connectionString};
-    pqxx::work txn{client};
+    connection client{connectionString};
+    work txn{client};
     txn.exec(sql);
     txn.commit();
     LOG_DEBUG << "Dropped table " << USER_PERMISSION_TABLE_NAME;

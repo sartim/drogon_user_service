@@ -2,6 +2,7 @@
 #include <iostream>
 #include <pqxx/pqxx>
 
+using namespace pqxx;
 using namespace std;
 
 const string USER_TABLE_NAME = "users";
@@ -20,8 +21,8 @@ void UserTable::create(const string &connectionString) {
                "updated_at timestamp with time zone,"
                "deleted_at timestamp with time zone"
                ")";
-    pqxx::connection client{connectionString};
-    pqxx::work txn{client};
+    connection client{connectionString};
+    work txn{client};
     txn.exec(sql);
     txn.commit();
     LOG_DEBUG << "Created table " << USER_TABLE_NAME;
@@ -38,8 +39,8 @@ void UserTable::alter(const string &connectionString) {
 void UserTable::_delete(const string &connectionString) {
   try {
     auto sql = "DROP TABLE IF EXISTS $1";
-    pqxx::connection client{connectionString};
-    pqxx::work txn{client};
+    connection client{connectionString};
+    work txn{client};
     txn.exec(sql);
     txn.commit();
     LOG_DEBUG << "Dropped table " << USER_TABLE_NAME;
