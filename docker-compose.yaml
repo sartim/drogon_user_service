@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: user-service:latest
+    container_name: user_service:latest
     environment:
       - SECRET_KEY=${SECRET_KEY}
       - DB_HOST=${DB_HOST}
