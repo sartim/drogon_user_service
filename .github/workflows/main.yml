@@ -17,7 +17,7 @@ jobs:
         ports:
         - 5432:5432
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Run unit tests
       run: echo "Run unit tests"
   build:
@@ -35,67 +35,14 @@ jobs:
     strategy:
       max-parallel: 1
     steps:
-    - uses: actions/checkout@v3
-    - name: Setup CI/CD Server
+    - uses: actions/checkout@v4
+    - name: Build Docker image
       run: |
-        sudo apt-get update &&
-        sudo apt-get install -y redis-server git &&
-        sudo apt-get install -y cmake g++ gcc libjsoncpp-dev uuid-dev openssl &&
-        sudo apt-get install -y libssl-dev zlib1g-dev libbz2-dev liblzma-dev &&
-        sudo apt-get install -y postgresql postgresql-contrib &&
-        sudo  apt-get clean && sudo rm -rf /var/lib/apt/lists/*
-    - name: Install Drogon Framework
-      run: | 
-        git clone https://github.com/drogonframework/drogon 
-        cd drogon && 
-        git submodule update --init && 
-        sudo mkdir build && cd build && sudo cmake .. && sudo make && sudo make install
-    - name: Install JWT CPP Library
-      run: |
-        git clone https://github.com/Thalhammer/jwt-cpp.git
-        cd jwt-cpp && mkdir build && cd build && sudo cmake .. && sudo make && sudo make install
-    - name: Install Bcrypt CPP Library
-      run: |
-        git clone https://github.com/hilch/Bcrypt.cpp.git
-    - name: Run Scripts
-      run: |
-        sudo chmod +x ./scripts/create_dot_env.sh
-        ./scripts/create_dot_env.sh
-      env:
-        SECRET_KEY: ${{secrets.SECRET_KEY}}
-        DB_NAME: ${{secrets.DB_NAME}}
-        DB_USER: ${{secrets.DB_USER}}
-        DB_PASS: ${{secrets.DB_PASS}}
-    - name: Build
-      run: |
-        mkdir build && cd build && cmake .. && make
-    - name: Compress binary
-      run: |
-        sudo mkdir drogon_user_service
-        sudo cp .env drogon_user_service
-        cd drogon_user_service && sudo zip -r drogon_user_service_prod.zip .
-    - name: Upload compressed binary to S3
-      # run: |
-      #   aws s3 cp drogon_user_service/drogon_user_service_prod.zip ${{ secrets.SMS_GATEWAY_S3_URI }}/drogon_user_service_prod.zip --region ${{ secrets.AWS_REGION }}
-      run: echo "Upload to aws s3 here"
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    strategy:
-      max-parallel: 1
-    steps:
-    - uses: actions/checkout@v3
-    - name: Setup CI/CD Server
-      run: |
-        sudo apt-get update &&
-        sudo apt-get install -y redis-server &&
-        sudo apt-get install -y awscli
-    - name: Deploy to prod
-      # run: aws deploy create-deployment --region ${{ secrets.AWS_REGION }} --application-name sms-gateway --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name sms-gateway-server-2-dg --description "Github deployment for commit ${GITHUB_SHA}" --s3-location bucket=eneza-sms-gateway,key=sms-gateway-bundle-prod.zip,bundleType=zip
-      run: echo "Create codedeploy deployment"
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        docker build \
+          --build-arg SECRET_KEY=${{ secrets.SECRET_KEY }} \
+          --build-arg DB_HOST=${{ secrets.DB_HOST }} \
+          --build-arg DB_NAME=${{ secrets.DB_NAME }} \
+          --build-arg DB_USER=${{ secrets.DB_USER }} \
+          --build-arg DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+          -t user_service:latest .
+
