@@ -1,5 +1,10 @@
-FROM ubuntu:20.04
+FROM ubuntu:20.04 AS build-env
 
+# Set the timezone
+ENV TZ=America/New_York
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+# Configure env
 ARG SECRET_KEY
 ARG DB_HOST
 ARG DB_PORT
@@ -13,10 +18,6 @@ ENV DB_PORT=$DB_PORT
 ENV DB_NAME=$DB_NAME
 ENV DB_USER=$DB_USER
 ENV DB_PASSWORD=$DB_PASSWORD
-
-# Set the timezone
-ENV TZ=America/New_York
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Update and install necessary packages
 RUN apt-get update
@@ -48,14 +49,15 @@ COPY . .
 RUN git clone https://github.com/hilch/Bcrypt.cpp.git
 
 # Run scripts
-RUN chmod +x scripts/create_dot_env.sh
+RUN chmod +x scripts -R
 RUN ./scripts/create_dot_env.sh
+RUN ./scripts/create_model_json.sh
 
 # Build app
-RUN mkdir build && cd build && cmake .. && make && chmod +x drogon_user_service
+RUN cmake . && make && chmod +x drogon_user_service
 
 # Expose port 8000 for the app
 EXPOSE 8000
 
 # Start the app
-CMD ["/build/drogon_user_service", "--action=run-server"]
+CMD ["./drogon_user_service", "--action=run-server"]

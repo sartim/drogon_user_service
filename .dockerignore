@@ -565,4 +565,4 @@ FodyWeavers.xsd
 .vscode
 
 # Dependencies
-/dependencies
+Bcrypt.cpp
