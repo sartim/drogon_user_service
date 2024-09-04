@@ -43,17 +43,11 @@ RUN git clone https://github.com/Thalhammer/jwt-cpp.git
 # Build and install the JWT-CPP library
 RUN cd jwt-cpp && mkdir build && cd build && cmake .. && make && make install
 
-
 # Copy the application code
 COPY . .
 
 # Install brcrypt
 RUN git clone https://github.com/hilch/Bcrypt.cpp.git
-
-# Run scripts
-RUN chmod +x scripts -R
-RUN ./scripts/create_dot_env.sh
-RUN ./scripts/create_model_json.sh
 
 # Build app
 RUN cmake . && make && chmod +x drogon_user_service
