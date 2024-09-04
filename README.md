@@ -33,14 +33,12 @@ On the project root:
     $ make
     $ sudo make install
     
-
 ## Install OpenSSL
 
     $ cd openssl
     $ ./config shared no-ssl2
     $ make
     $ make install
-
 
 ## Running server
 
