@@ -13,6 +13,7 @@
 #include <map>
 #include <sstream>
 #include <stdexcept>
+#include <cstdlib>
 
 using namespace std;
 using namespace drogon;
@@ -186,18 +187,15 @@ map<string, string> loadEnvVariables(const string &filename) {
 }
 
 void generateConfigFile() {
-  // Load environment variables from .env file
-  map<string, string> envVariables = loadEnvVariables(".env");
-
+  // Retrieve environment variables
+  const char* secretKey = getenv("SECRET_KEY");
+  const char* dbHost = getenv("DB_HOST");
+  const char* dbName = getenv ("DB_NAME");
+  const char* user = getenv("DB_USER");
+  const char* password = getenv("DB_PASSWORD");
+  
   // Create a JSON object
   Json::Value config;
-  // Set the values for the variables from environment variables
-  string secretKey = envVariables["SECRET_KEY"];
-  string dbHost = envVariables["DB_HOST"];
-  string dbName = envVariables["DB_NAME"];
-  string user = envVariables["DB_USER"];
-  string password = envVariables["DB_PASSWORD"];
-
   config["secret_key"] = secretKey;
   config["db_clients"] = Json::Value(Json::arrayValue);
   Json::Value &dbClients = config["db_clients"];
@@ -233,8 +231,12 @@ void generateConfigFile() {
 
 int main(int argc, char *argv[]) {
 
-  // Generate config file from .env
+  // Generate config file from environment variables
   generateConfigFile();
+
+  // Generate models.json
+  string scriptPath = "./scripts/create_model_json.sh";
+  int result = system(scriptPath.c_str());
 
   // Check if the correct number of command-line arguments is provided
   if (argc != 2) {
@@ -258,15 +260,16 @@ int main(int argc, char *argv[]) {
   string value = action.substr(equalsPos + 1);
 
   // Database config to database cli interface
-  map<string, string> envVariables = loadEnvVariables(".env");
+  const char* secretKey = getenv("SECRET_KEY");
+  const char* dbHost = getenv("DB_HOST");
+  const char* dbName = getenv ("DB_NAME");
+  const char* user = getenv("DB_USER");
+  const char* password = getenv("DB_PASSWORD");
+
   Json::Value config;
-  string secretKey = envVariables["SECRET_KEY"];
-  string dbHost = envVariables["DB_HOST"];
-  string dbName = envVariables["DB_NAME"];
-  string user = envVariables["DB_USER"];
-  string password = envVariables["DB_PASSWORD"];
+  string dbUser = user;
   string port = "5432";
-  string connectionString = "postgresql://"+ user +":"+ password +"@"+ dbHost +":"+ port +"/"+ dbName;
+  string connectionString = "postgresql://"+ dbUser +":"+ password +"@"+ dbHost +":"+ port +"/"+ dbName + "?sslmode=require";
 
   // Check the action and perform the corresponding operation
   if (key == "--action") {
