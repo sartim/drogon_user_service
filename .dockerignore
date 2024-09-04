@@ -566,3 +566,6 @@ FodyWeavers.xsd
 
 # Dependencies
 Bcrypt.cpp
+
+# Files
+.env

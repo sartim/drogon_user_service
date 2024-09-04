@@ -33,7 +33,9 @@ RUN git clone https://github.com/drogonframework/drogon
 # Build and install the Drogon library
 RUN cd drogon && \
     git submodule update --init && \
-    mkdir build && cd build && cmake .. && make && make install
+    mkdir build && cd build && \
+    cmake -DCMAKE_BUILD_TYPE=Release .. && \
+    make && make install
 
 # Clone JWT-CPP repository
 RUN git clone https://github.com/Thalhammer/jwt-cpp.git

@@ -48,7 +48,14 @@ On the project root:
     $ cmake ..
     $ make
     $ ./drogoncore_user_service --action=run-server
-    $ ./drogoncore_user_service --action=run-server
+
+# Create tables
+
+    $ ./drogon_user_service --action=create-tables
+
+# Drop tables
+
+    $ ./drogon_user_service --action=drop-tables
 
 ## Running with docker
     

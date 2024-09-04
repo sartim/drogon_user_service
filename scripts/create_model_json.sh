@@ -1,12 +1,12 @@
 cat << EOF > models/model.json
 {
     "rdbms": "postgresql",
-    "host": ${DB_HOST},
+    "host": "${DB_HOST}",
     "port": 5432,
-    "dbname": ${DB_NAME},
+    "dbname": "${DB_NAME}",
     "schema": "public",
-    "user": ${DB_USER},
-    "password": ${DB_PASSWORD},
+    "user": "${DB_USER}",
+    "password": "${DB_PASSWORD}",
     "tables": [
         "users",
         "roles",
