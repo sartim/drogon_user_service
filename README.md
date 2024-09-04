@@ -51,11 +51,11 @@ On the project root:
 
 # Create tables
 
-    $ ./drogoncore_user_service --action=create-tables
+    $ ./drogon_user_service --action=create-tables
 
 # Drop tables
 
-    $ ./drogoncore_user_service --action=drop-tables
+    $ ./drogon_user_service --action=drop-tables
 
 ## Running with docker
     
