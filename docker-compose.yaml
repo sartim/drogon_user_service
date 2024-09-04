@@ -5,6 +5,8 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: user_service
+    ports:
+      - "8000:8000"
     environment:
       - SECRET_KEY=${SECRET_KEY}
       - DB_HOST=${DB_HOST}
